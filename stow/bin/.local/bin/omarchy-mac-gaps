@@ -1,20 +1,26 @@
 #!/bin/bash
 # AeroSpace reads [gaps] only at load, so the only gaps toggle is: rewrite the
-# block and reload. ON = Omarchy (in 10 / out 10 / top 26+10). OFF = zero, but
+# block and reload. ON = Omarchy (in 10 / out 10 / top bar+gap). OFF = zero, but
 # top stays at the bar height so windows never slide under SketchyBar.
-# ponytail: keep these three constants in sync with sketchybarrc's height=26.
-BAR=26; GAP=10; TOP=$((BAR + GAP))
-f="$HOME/.aerospace.toml"
+#
+# The config is a GNU stow symlink and `sed -i` refuses those outright
+# ("in-place editing only works for regular files"), so resolve it first.
+# ponytail: keep BAR in sync with sketchybarrc's height=26.
+BAR=26; GAP=10; TOP=$((BAR + GAP)); NOTCH=$((BAR + GAP + 10))
+f=$(readlink -f "$HOME/.aerospace.toml" 2>/dev/null || echo "$HOME/.aerospace.toml")
 
-if /usr/bin/grep -qE "^outer\.top *= *$TOP\$" "$f"; then
-  i=0; o=0; t=$BAR          # gaps off
+# State is read from inner.horizontal, not outer.top: outer.top is a per-monitor
+# array (built-in displays reserve more for the notch) and will not compare
+# cleanly against a single number.
+if /usr/bin/grep -qE "^inner\.horizontal *= *0$" "$f"; then
+  i=$GAP; o=$GAP; t="[{ monitor.\"built-in\" = $NOTCH }, $TOP]"   # gaps on
 else
-  i=$GAP; o=$GAP; t=$TOP    # gaps on
+  i=0;    o=0;    t="[{ monitor.\"built-in\" = $BAR }, $BAR]"     # gaps off
 fi
 
 /usr/bin/sed -i '' -E \
   -e "s/^(inner\.(horizontal|vertical) *=).*/\1 $i/" \
   -e "s/^(outer\.(left|right|bottom) *=).*/\1 $o/" \
-  -e "s/^(outer\.top *=).*/\1 $t/" "$f"
+  -e "s|^(outer\.top *=).*|\1 $t|" "$f"
 
 /opt/homebrew/bin/aerospace reload-config

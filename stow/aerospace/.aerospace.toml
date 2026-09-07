@@ -93,7 +93,10 @@ inner.vertical = 10
 outer.left = 10
 outer.right = 10
 outer.bottom = 10
-outer.top = 36
+# Per-monitor. A built-in MacBook display has the notch/menu-bar strip to clear,
+# so it reserves more; every external display gets bar height 26 + gap 10.
+# AeroSpace accepts `[{ monitor.<pattern> = N }, default]` here (verified).
+outer.top = [{ monitor."built-in" = 46 }, 36]
 
 [mode.main.binding]
 

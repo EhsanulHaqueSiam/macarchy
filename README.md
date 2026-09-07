@@ -155,6 +155,26 @@ Audio, wifi and bluetooth are interactive, standing in for Omarchy's popout pane
 
 Colours come from the active Omarchy theme (`omarchy-mac-colors` reads its `colors.toml`), so `⌥⇧⌃Space` restyles the bar and the window borders together.
 
+## Other screens
+
+Most of it adapts on its own:
+
+- the bar draws on every display (`display=all`) and the workspace pills read
+  `--monitor all`
+- `outer.top` is per-monitor, so a built-in MacBook display reserves extra room
+  for the notch strip while externals get bar height + gap
+- `bordersrc` sets `hidpi` from whether the display is retina
+- `make docs` reads the screen width at capture time
+
+Two things to tune by hand if your display differs:
+
+- **Notched MacBook**: the built-in gap is 46. If the bar still collides with the
+  notch, raise that number in `[gaps] outer.top`, and consider sketchybar's
+  `notch_width` to split the bar around it.
+- **Bar height**: `sketchybarrc` uses 26 to match Omarchy. If you change it,
+  change `BAR` in `omarchy-mac-gaps` and the `outer.top` numbers to match, or
+  windows will slide under the bar.
+
 ## Reaching the macOS menu bar
 
 SketchyBar sits at CG level 25, above the menu bar's 24, so the auto-hide reveal is behind it. Menus drop *downward* though, so only the strip of titles is ever hidden.

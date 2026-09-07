@@ -35,6 +35,11 @@ set -- $(hypr hyprland_active_border)
 AFROM=${1:-0xee8a8588}; ATO=${2:-$AFROM}
 INACT=$(hypr hyprland_inactive_border); INACT=${INACT:-0xaa584e51}
 
+# A retina display needs hidpi=on or the 2pt border renders thin and soft.
+# Detected rather than assumed, so the same config works on any screen.
+HIDPI=off
+system_profiler SPDisplaysDataType 2>/dev/null | /usr/bin/grep -qi retina && HIDPI=on
+
 mkdir -p "$HOME/.config/borders"
 cat > "$HOME/.config/borders/bordersrc" <<EOB
 #!/bin/bash
@@ -43,7 +48,7 @@ cat > "$HOME/.config/borders/bordersrc" <<EOB
 options=(
   style=round
   width=2.0
-  hidpi=off
+  hidpi=$HIDPI
   active_color="gradient(top_left=$AFROM,bottom_right=$ATO)"
   inactive_color=$INACT
 )
