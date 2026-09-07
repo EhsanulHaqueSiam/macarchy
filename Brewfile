@@ -3,12 +3,13 @@
 tap "felixkratz/formulae"
 tap "nikitabobko/tap"
 tap "smudge/smudge"
+tap "asmvik/formulae"   # skhd moved here from koekeishiya
 
 # window manager, hotkeys, bar, borders
 cask "aerospace"
 brew "felixkratz/formulae/borders"
 brew "felixkratz/formulae/sketchybar"
-brew "koekeishiya/formulae/skhd"
+brew "asmvik/formulae/skhd"
 
 # used by the bar and the bindings
 brew "blueutil"          # bluetooth widget
