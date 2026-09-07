@@ -1,6 +1,8 @@
-# omarchy-mac
+# macarchy
 
-[Omarchy](https://omarchy.org)'s Hyprland window management, keybindings and top bar, rebuilt on macOS with AeroSpace, skhd, SketchyBar and JankyBorders.
+An [Omarchy](https://omarchy.org)-flavoured macOS desktop: Hyprland's window management, keybindings and bar, rebuilt with AeroSpace, skhd, SketchyBar and JankyBorders.
+
+This is not Omarchy running on macOS, and it is not affiliated with the Omarchy project. It recreates Omarchy's look, feel and keymap out of native macOS tools.
 
 142 of Omarchy's 149 mappable default bindings work here (95%). The remaining 7 are listed at the bottom with the reason each one is impossible.
 
@@ -17,8 +19,8 @@ So Omarchy's `SUPER + SHIFT + ALT + F` is `⌥⇧⌘F`.
 ## Install
 
 ```sh
-git clone https://github.com/EhsanulHaqueSiam/omarchy-mac.git
-cd omarchy-mac
+git clone https://github.com/EhsanulHaqueSiam/macarchy.git
+cd macarchy
 ./install.sh
 ```
 
@@ -41,7 +43,7 @@ GNU stow packages, one per tool. `.stowrc` points stow at `stow/` with `$HOME` a
 the target, so `stow sketchybar` from the repo root needs no flags.
 
 ```
-omarchy-mac/
+macarchy/
 ├── Makefile              make help / link / doctor / keys / dump
 ├── install.sh            brew + trust + stow + defaults + services
 ├── macos-defaults.sh     the macOS settings the rig depends on
