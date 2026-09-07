@@ -59,6 +59,12 @@ on-window-detected = [
   { if = 'test %{app-bundle-id} = com.raycast.macos',             run = ['layout floating'] },
   { if = 'test %{app-bundle-id} = com.localsend.localsend_app',   run = ['layout floating'] },
   { if = 'test %{app-name} ~= qemu', run = ['layout floating'] },
+  # Catch-all, LAST: only windows that matched no float rule reach it.
+  # Reproduces Hyprland's dwindle nesting; see the script for the why.
+  # AeroSpace stops at the FIRST matching callback unless
+  # check-further-callbacks is set, so this catch-all only runs for windows
+  # that matched no float rule above. `if` is required: omitting it is an error.
+  { if = 'true', run = ['exec-and-forget /Users/ehsanulhaquesiam/.local/bin/omarchy-mac-dwindle'] },
 ]
 
 [exec]
@@ -203,6 +209,11 @@ alt-shift-cmd-down = 'move-workspace-to-monitor --wrap-around down'   # Move wor
 # alt-ctrl-tab (former workspace). Next-monitor moves to Ctrl+Cmd+Tab.
 ctrl-cmd-tab = 'focus-monitor --wrap-around next'        # Focus on next monitor
 ctrl-cmd-shift-tab = 'focus-monitor --wrap-around prev'  # Focus on previous monitor
+
+# --- extras AeroSpace offers that Omarchy has no chord for --------------
+alt-b = 'balance-sizes'                    # Balance window sizes
+alt-cmd-b = 'focus-back-and-forth'         # Focus the previous window
+alt-m = 'macos-native-minimize'            # Minimize window (macOS)
 
 # --- meta ---------------------------------------------------------------
 alt-shift-r = 'reload-config'         # Reload config

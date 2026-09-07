@@ -1,0 +1,35 @@
+#!/bin/bash
+# Hyprland's dwindle layout, reproduced on AeroSpace.
+#
+# Hyprland nests each new window INTO the focused cell, which is what produces
+# the spiral. AeroSpace instead appends it as another sibling, so three windows
+# become three equal columns rather than one column beside a stack.
+#
+# Pulling the new window into a container with its neighbour restores the
+# nesting, and `enable-normalization-opposite-orientation-for-nested-containers`
+# flips the new container to the other axis for free. No window geometry is
+# needed - and AeroSpace exposes none - because the parent's layout already says
+# which side the new window landed on:
+#   parent h_tiles -> it went to the right  -> join left
+#   parent v_tiles -> it went below         -> join up
+#
+# Measured on a 1920x1080 display, opening four windows:
+#   1: 1900x1033
+#   2:  945x1033   945x1033
+#   3:  945x1033   945x512    945x512
+#   4:  945x1033   945x511    468x511   468x511
+#
+# Disable by removing the last on-window-detected entry in ~/.aerospace.toml.
+export PATH="/opt/homebrew/bin:$PATH"
+
+# Fewer than three windows already looks like dwindle: one fills the screen,
+# two split it. Joining at two would nest the pair under the root and the
+# flatten normalization would just collapse it back to a stack.
+ws=$(aerospace list-workspaces --focused 2>/dev/null) || exit 0
+n=$(aerospace list-windows --workspace "$ws" --count 2>/dev/null) || exit 0
+[ "${n:-0}" -lt 3 ] && exit 0
+
+case "$(aerospace list-windows --focused --format '%{window-layout}' 2>/dev/null)" in
+  h_tiles) aerospace join-with left 2>/dev/null ;;
+  v_tiles) aerospace join-with up   2>/dev/null ;;
+esac
