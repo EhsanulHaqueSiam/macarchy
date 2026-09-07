@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# macarchy - one entry point for humans and coding agents.
+# Run `macarchy help` for the list. Agents: read AGENTS.md in the repo first.
+set -uo pipefail
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+REPO="${MACARCHY_REPO:-$HOME/macarchy}"
+PKGS="aerospace skhd sketchybar borders bin"
+
+usage(){ cat <<'USAGE'
+macarchy <command>
+
+  doctor         health check: services, both configs, disjointness, macOS settings
+  verify         run the functional regression suite (exits non-zero on failure)
+  keys           the keybinding cheat sheet, generated from the live configs
+  bindings       every binding from both configs, as TSV (add --json for JSON)
+  where          print the repo path
+
+  link | relink | unlink    GNU stow the configs into $HOME
+  reload         restart aerospace, skhd, sketchybar, borders
+  colors         rebuild bar + border colours from the active Omarchy theme
+  docs           capture screenshots + demo gif (must run ON the Mac, not over ssh)
+
+Ownership rule: ~/.aerospace.toml holds only native AeroSpace commands,
+~/.config/skhd/skhdrc holds anything that runs a program. A chord in both
+fires twice; `macarchy doctor` fails if they intersect.
+USAGE
+}
+
+# Both configs, normalised to: tool <TAB> chord <TAB> action
+dump_bindings(){
+  /usr/bin/python3 - "$HOME/.aerospace.toml" "$HOME/.config/skhd/skhdrc" "${1:-tsv}" <<'PYEOF'
+import json, re, sys
+aero, skhd, fmt = sys.argv[1], sys.argv[2], sys.argv[3]
+rows, table = [], None
+for line in open(aero):
+    s = line.strip()
+    if s.startswith("[") and s.endswith("]"):
+        table = s; continue
+    if table != "[mode.main.binding]":
+        continue
+    m = re.match(r"^([a-z0-9-]+)\s*=\s*'([^']*)'\s*(?:#\s*(.*))?$", s)
+    if m:
+        rows.append({"tool": "aerospace", "chord": m.group(1),
+                     "action": m.group(2), "desc": (m.group(3) or "").strip()})
+for line in open(skhd):
+    s = line.rstrip("\n")
+    if s.strip().startswith(("#", ".")) or ":" not in s:
+        continue
+    body, _, desc = s.partition("#")
+    lhs, _, cmd = body.partition(":")
+    if not lhs.strip() or not cmd.strip():
+        continue
+    rows.append({"tool": "skhd", "chord": lhs.strip(),
+                 "action": cmd.strip(), "desc": desc.strip()})
+if fmt == "json":
+    print(json.dumps(rows, indent=2))
+else:
+    for r in rows:
+        print("%s\t%s\t%s" % (r["tool"], r["chord"], r["desc"] or r["action"]))
+PYEOF
+}
+
+# Real regression suite. Uses an empty workspace and restores what it touches.
+verify(){
+  local pass=0 fail=0
+  chk(){ if [ "$2" = "$3" ]; then echo "  PASS  $1"; pass=$((pass+1));
+         else echo "  FAIL  $1  got[$2] want[$3]"; fail=$((fail+1)); fi; }
+
+  echo "health:"
+  omarchy-mac-doctor >/dev/null 2>&1 && echo "  PASS  doctor" && pass=$((pass+1)) \
+    || { echo "  FAIL  doctor (run: macarchy doctor)"; fail=$((fail+1)); }
+
+  echo "configs:"
+  chk "aerospace parses" "$(aerospace reload-config 2>&1 | /usr/bin/grep -c ERROR)" "0"
+  chk "aerospace bindings registered" \
+      "$([ "$(aerospace config --get mode.main.binding --json | jq -r 'keys|length')" -gt 50 ] && echo many || echo few)" "many"
+  chk "skhd config clean" "$(/usr/bin/grep -ci error "/tmp/skhd_$USER.err.log" 2>/dev/null || echo 0)" "0"
+
+  echo "bar:"
+  chk "sketchybar running" "$(pgrep -x sketchybar >/dev/null && echo y || echo n)" "y"
+  chk "bar visible" "$(sketchybar --query bar | jq -r .hidden)" "off"
+
+  echo "window management:"
+  local start; start=$(aerospace list-workspaces --focused)
+  for w in 3 5; do
+    aerospace trigger-binding "alt-$w" --mode main 2>/dev/null; sleep 0.9
+    chk "alt-$w switches + lights its pill" \
+        "$(aerospace list-workspaces --focused)/$(sketchybar --query "space.$w" | jq -rc '.label.value')" "$w/󱓻"
+  done
+  aerospace workspace "$start" >/dev/null 2>&1
+
+  echo
+  echo "$pass passed, $fail failed"
+  [ "$fail" -eq 0 ]
+}
+
+case "${1:-help}" in
+  doctor)   omarchy-mac-doctor ;;
+  verify)   verify ;;
+  keys)     omarchy-mac-keys-gen ;;
+  bindings) [ "${2:-}" = "--json" ] && dump_bindings json || dump_bindings tsv ;;
+  where)    echo "$REPO" ;;
+  link)     (cd "$REPO" && stow $PKGS)    && echo "linked" ;;
+  relink)   (cd "$REPO" && stow -R $PKGS) && echo "relinked" ;;
+  unlink)   (cd "$REPO" && stow -D $PKGS) && echo "unlinked" ;;
+  colors)   omarchy-mac-colors ;;
+  docs)     "$REPO/scripts/capture-docs.sh" ;;
+  reload)   aerospace reload-config || true
+            skhd --restart-service || true
+            sketchybar --reload || true
+            brew services restart borders >/dev/null 2>&1 || true
+            echo "reloaded" ;;
+  help|-h|--help) usage ;;
+  *) echo "unknown command: $1" >&2; echo; usage; exit 2 ;;
+esac

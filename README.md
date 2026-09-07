@@ -150,6 +150,20 @@ It has to run on the Mac itself. macOS gates screen capture behind a Screen
 Recording grant that cannot be given to an ssh session from the command line, so
 `screencapture` over ssh only ever returns "could not create image from display".
 
+## For agents
+
+`macarchy` is the single entry point, and [AGENTS.md](AGENTS.md) is the contract:
+the ownership rule, the traps, and how to verify a change.
+
+```sh
+macarchy help              # every subcommand
+macarchy doctor            # services, configs, disjointness, macOS settings
+macarchy verify            # functional regression suite, non-zero exit on failure
+macarchy bindings --json   # all 186 bindings from both configs, machine readable
+macarchy keys              # human cheat sheet, generated from the live configs
+macarchy reload            # restart all four services
+```
+
 ## Troubleshooting
 
 `omarchy-mac-doctor` checks all four services, both configs, that they stay disjoint, that AeroSpace callbacks get `USER` (without it SketchyBar stops repainting), that `bordersrc` actually invokes borders, and the macOS settings the rig depends on.

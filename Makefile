@@ -2,7 +2,7 @@
 # targets below need no flags.
 PKGS := aerospace skhd sketchybar borders bin
 
-.PHONY: help install link relink unlink brew trust defaults colors services doctor keys dump docs
+.PHONY: help install link relink unlink brew trust defaults colors services doctor verify keys dump docs
 .DEFAULT_GOAL := help
 
 help:            ## show this help
@@ -40,7 +40,10 @@ services:        ## restart aerospace, skhd, sketchybar, borders
 	@brew services restart borders >/dev/null || true
 
 doctor:          ## health check
-	@omarchy-mac-doctor
+	@macarchy doctor
+
+verify:          ## functional regression suite
+	@macarchy verify
 
 keys:            ## print the keybinding cheat sheet
 	@omarchy-mac-keys-gen
