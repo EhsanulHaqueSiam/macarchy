@@ -50,6 +50,13 @@ callbacks actually receive.
 started with no arguments. A file that never calls `borders` leaves it running on
 stock defaults while `pgrep borders` looks perfectly healthy.
 
+**Window opening is dwindled by `omarchy-mac-dwindle`**, wired as the LAST
+`on-window-detected` entry. AeroSpace stops at the first matching rule, so
+floating apps never reach it. That entry needs an explicit `if = 'true'`:
+omitting `if` is a hard error, and AeroSpace rejects the WHOLE config on one
+error while silently keeping the old one, so always check `aerospace
+reload-config` output rather than assuming a change took.
+
 **`split` is a no-op** while `enable-normalization-flatten-containers = true`.
 AeroSpace says so itself. Use `join-with`, which is what `⌥⌘arrow` is bound to.
 

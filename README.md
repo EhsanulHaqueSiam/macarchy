@@ -113,6 +113,28 @@ back the symlinks out without losing anything.
 | `⌥⇧Space` | swap the bar for the real macOS menu bar |
 | `⌥⌘M` | the focused app's File/Edit/View menus |
 
+## Window opening
+
+New windows nest the way Hyprland's dwindle does, rather than becoming another
+equal column. Measured on 1920x1080:
+
+```
+1 window    1900x1033
+2 windows    945x1033   945x1033
+3 windows    945x1033   945x512    945x512
+4 windows    945x1033   945x511    468x511   468x511
+```
+
+`omarchy-mac-dwindle` runs from `on-window-detected` and pulls each new window
+into a container with its neighbour. The opposite-orientation normalization
+flips that container to the other axis for free, which is what makes the spiral.
+It needs no window geometry, which matters because AeroSpace exposes none: the
+parent's layout already says which side the new window landed on. Floating apps
+skip it, because AeroSpace stops at the first matching `on-window-detected` rule.
+
+Remove the last `on-window-detected` entry in `~/.aerospace.toml` to get plain
+sibling columns back.
+
 ## The bar
 
 Omarchy's widget set, in Omarchy's order:
@@ -149,7 +171,7 @@ SketchyBar sits at CG level 25, above the menu bar's 24, so the auto-hide reveal
 - `⌥O` floats but cannot pin.
 - `⌥⌃X` is Mission Control. Omarchy's dictation toggle has no macOS CLI.
 - `PRINT` is `F13`.
-- New windows join the focused container. Hyprland's dwindle picks the split axis from the window's aspect ratio automatically; AeroSpace exposes no window geometry, so `⌥⌘arrow` is the manual equivalent.
+- Moving an existing window *into* a workspace leaves it as a plain sibling rather than folding it into the spiral; AeroSpace has no callback for a moved window, only a new one. `⌥⌘arrow` nests it, `⌥b` rebalances.
 
 ## Not reproducible on macOS
 
