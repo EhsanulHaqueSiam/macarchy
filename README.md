@@ -6,6 +6,20 @@ This is not Omarchy running on macOS, and it is not affiliated with the Omarchy 
 
 142 of Omarchy's 149 mappable default bindings work here (95%). The remaining 7 are listed at the bottom with the reason each one is impossible.
 
+<!-- gallery -->
+## Looks like
+
+![The bar](docs/bar.png)
+
+Workspace switching, split flipping and grouping:
+
+![demo](docs/demo.gif)
+
+| Three columns | After OPT+J | After OPT+CMD+Left | Accordion |
+| --- | --- | --- | --- |
+| ![Three columns](docs/tiling-three-columns.png) | ![After OPT+J](docs/tiling-vertical-split.png) | ![After OPT+CMD+Left](docs/tiling-mixed-split.png) | ![Accordion](docs/tiling-accordion.png) |
+
+
 ## The key model
 
 | Omarchy | here | why |

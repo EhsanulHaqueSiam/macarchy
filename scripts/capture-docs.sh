@@ -23,12 +23,17 @@ bounds=$(osascript -e 'tell application "Finder" to get bounds of window of desk
 W=$(printf '%s' "$bounds" | awk -F', ' '{print $3}')
 echo "display width ${W}"
 
-WS=""
-for c in 8 9 7 6; do
-  [ "$($AS list-windows --workspace $c --count 2>/dev/null || echo 0)" = "0" ] && { WS=$c; break; }
+# Only ever touch EMPTY workspaces. The demo recording must not pan across
+# real windows: these images are meant to be publishable.
+EMPTY=""
+for c in 8 9 7 6 5 4; do
+  [ "$($AS list-windows --workspace $c --count 2>/dev/null || echo 0)" = "0" ] && EMPTY="$EMPTY $c"
 done
+set -- $EMPTY
+WS="${1:-}"
 [ -z "$WS" ] && { echo "no empty workspace free; close something and retry" >&2; exit 1; }
-echo "using workspace $WS"
+TOUR="$WS ${2:-$WS} ${3:-$WS}"
+echo "demo workspace $WS; tour across$EMPTY (all empty, so nothing of yours is filmed)"
 
 shot(){ sleep 1.2; $SC -x -o "$OUT/$1.png"; echo "  $1.png"; }
 crop(){ sleep 1.2; $SC -x -R"$2" "$OUT/$1.png"; echo "  $1.png"; }
@@ -53,7 +58,10 @@ rm -f /tmp/macarchy-demo.mov
 $SC -v -V 16 -x -C /tmp/macarchy-demo.mov &
 REC=$!
 sleep 2
-for b in alt-1 alt-2 alt-3 alt-j alt-cmd-left alt-cmd-g alt-f alt-f alt-5 "alt-$WS"; do fire "$b"; done
+# Workspace hops stay inside the empty set, then layout work on the demo one.
+for w in $TOUR; do fire "alt-$w"; done
+fire "alt-$WS"
+for b in alt-j alt-j alt-cmd-left alt-cmd-g alt-g alt-g alt-f alt-f; do fire "$b"; done
 wait $REC 2>/dev/null
 
 echo "gif:"
