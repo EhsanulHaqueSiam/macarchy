@@ -14,6 +14,12 @@ if [ "${1:-}" != "--no-brew" ]; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   eval "$(/opt/homebrew/bin/brew shellenv)"
   say "Packages"
+  # Homebrew will not load third-party tap formulae until they are trusted, and
+  # `brew bundle` fails outright without it. Tap and trust first.
+  for t in felixkratz/formulae nikitabobko/tap smudge/smudge asmvik/formulae; do
+    brew tap "$t" >/dev/null 2>&1 || true
+    brew trust --tap "$t" >/dev/null 2>&1 || true
+  done
   brew bundle --file="$REPO/Brewfile"
 else
   eval "$(/opt/homebrew/bin/brew shellenv)"

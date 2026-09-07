@@ -24,6 +24,9 @@ cd omarchy-mac
 
 That installs Homebrew if missing, runs the `Brewfile`, links every config with GNU stow, applies the macOS defaults, starts the four services and runs the health check.
 
+`install.sh` taps and `brew trust`s the third-party taps first (AeroSpace, SketchyBar, borders, skhd, nightlight);
+Homebrew refuses to load their formulae otherwise and `brew bundle` fails.
+
 Three things macOS will not let a script do:
 
 - **Privacy & Security > Accessibility**: AeroSpace, borders
