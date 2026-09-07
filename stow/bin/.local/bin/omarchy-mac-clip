@@ -1,0 +1,6 @@
+#!/bin/bash
+# Omarchy's SUPER+C/V/X universal clipboard, mapped to the macOS equivalents.
+case "$1" in
+  copy)  k="c" ;; paste) k="v" ;; cut) k="x" ;; *) exit 1 ;;
+esac
+exec osascript -e "tell application \"System Events\" to keystroke \"$k\" using {command down}"

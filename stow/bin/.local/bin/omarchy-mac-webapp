@@ -1,0 +1,3 @@
+#!/bin/sh
+# Open a URL as its own Zen window (Omarchy webapp bindings).
+exec open -na Zen --args --new-window "$1"

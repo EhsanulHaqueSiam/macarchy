@@ -1,0 +1,220 @@
+# ~/.aerospace.toml - Omarchy on macOS: the WINDOW MANAGER half.
+#
+#   Option (⌥) = Omarchy SUPER.   Cmd (⌘) = Hyprland's ALT.   ctrl = CTRL.
+#
+# So Omarchy's SUPER+SHIFT+ALT+F is ⌥⇧⌘F here. Every binding is a 1:1 port of
+# ~/.local/share/omarchy/default/hypr/bindings/tiling.lua unless the trailing
+# comment says otherwise.
+#
+# OWNERSHIP - this file and ~/.config/skhd/skhdrc are strictly disjoint:
+#   AeroSpace  = native AeroSpace commands (no process spawn, lowest latency).
+#   skhd       = anything that runs a program, plus key synthesis (⌥C/⌥V/⌥X).
+# Never bind the same chord in both; both would fire. omarchy-mac-doctor checks.
+#
+# The `# comment` after each binding is its description in ⌥K
+# (omarchy-mac-keys-gen parses this file and skhdrc directly), so keep it short.
+#
+# Every top-level key MUST stay above the first [table]: TOML parses a bare key
+# after a table header as belonging to that table.
+
+config-version = 2
+start-at-login = true
+auto-reload-config = true
+after-startup-command = [
+  'exec-and-forget /opt/homebrew/bin/sketchybar --reload',
+  'exec-and-forget /opt/homebrew/bin/skhd --restart-service',
+]
+
+# Keep both normalizations on. AeroSpace's guide recommends them for anyone who
+# is not an experienced i3 user, and they are what makes the tree behave like
+# Hyprland's dwindle instead of accumulating single-child containers.
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+accordion-padding = 30
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+automatically-unhide-macos-hidden-apps = true
+
+# SNAPPINESS: no `move-mouse` on focus change. Warping the pointer on every
+# focus change is the most visible source of lag and it fights the hand on the
+# mouse. The pointer still follows a MONITOR change, where it earns its keep.
+# The sketchybar trigger stays: it is what repaints the workspace pills when a
+# window is moved away silently (⌥⇧⌘<n>) without a workspace switch.
+on-focus-changed = ['exec-and-forget /opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change']
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+exec-on-workspace-change = ['/bin/bash', '-c',
+  '/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE']
+
+# Omarchy's float rules. Apply to already-open windows with:
+#   aerospace reload-config && aerospace run-callback --for-every-window on-window-detected
+on-window-detected = [
+  { if = 'test %{app-bundle-id} = com.apple.calculator',          run = ['layout floating'] },
+  { if = 'test %{app-bundle-id} = com.apple.systempreferences',   run = ['layout floating'] },
+  { if = 'test %{app-bundle-id} = com.apple.finder',              run = ['layout floating'] },
+  { if = 'test %{app-bundle-id} = com.apple.ActivityMonitor',     run = ['layout floating'] },
+  { if = 'test %{app-bundle-id} = com.apple.iphonesimulator',     run = ['layout floating'] },
+  { if = 'test %{app-bundle-id} = com.apple.ScreenSharing',       run = ['layout floating'] },
+  { if = 'test %{app-bundle-id} = com.apple.DigitalColorMeter',   run = ['layout floating'] },
+  { if = 'test %{app-bundle-id} = com.apple.screenshot.launcher', run = ['layout floating'] },
+  { if = 'test %{app-bundle-id} = com.raycast.macos',             run = ['layout floating'] },
+  { if = 'test %{app-bundle-id} = com.localsend.localsend_app',   run = ['layout floating'] },
+  { if = 'test %{app-name} ~= qemu', run = ['layout floating'] },
+]
+
+[exec]
+inherit-env-vars = false
+
+# `inherit-env-vars = false` above means callbacks get ONLY what is listed
+# here. sketchybar's client aborts with "'env USER' not set! abort.." if USER
+# is missing, which silently broke every workspace-change repaint that had no
+# focus change to fall back on - i.e. switching to an EMPTY workspace looked
+# like the bar was frozen. Absolute paths everywhere for the same reason.
+[exec.env-vars]
+USER = 'ehsanulhaquesiam'
+HOME = '/Users/ehsanulhaquesiam'
+PATH = '/Users/ehsanulhaquesiam/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
+
+[key-mapping]
+preset = 'qwerty'
+
+# Hyprland gaps_in = 5 PER EDGE -> AeroSpace inner (the total between windows) = 10.
+# gaps_out = 10. outer.top = 26px SketchyBar + 10.
+# omarchy-mac-gaps rewrites these four values in place; keep the names anchored
+# at column 0 or that sed stops matching.
+[gaps]
+inner.horizontal = 10
+inner.vertical = 10
+outer.left = 10
+outer.right = 10
+outer.bottom = 10
+outer.top = 36
+
+[mode.main.binding]
+
+# --- windows ------------------------------------------------------------
+alt-w = 'close'                                       # Close window
+alt-q = 'close --quit-if-last-window'                 # Close window (quits app if last)
+ctrl-cmd-backspace = 'close-all-windows-but-current'  # Close all windows (CTRL+ALT+DELETE)
+ctrl-alt-backspace = 'close-all-windows-but-current'  # Close all windows (literal Ctrl+Opt+Delete)
+alt-j = 'layout horizontal vertical'                  # Toggle window split
+alt-p = 'layout h_accordion v_accordion'              # Pseudo -> no macOS analog; toggles tabbed/stacked group
+alt-t = 'layout floating tiling'                      # Toggle window floating/tiling
+alt-f = 'fullscreen'                                  # Full screen
+alt-ctrl-f = 'fullscreen --no-outer-gaps'             # Tiled full screen
+alt-cmd-f = 'macos-native-fullscreen'                 # Full width (macOS native fullscreen)
+alt-o = 'layout floating'                             # Pop window out (float; macOS cannot pin)
+alt-l = 'layout --root tiles accordion'               # Toggle workspace layout
+
+alt-left = 'focus --boundaries-action wrap-around-the-workspace left'    # Focus on left window
+alt-right = 'focus --boundaries-action wrap-around-the-workspace right'  # Focus on right window
+alt-up = 'focus --boundaries-action wrap-around-the-workspace up'        # Focus on above window
+alt-down = 'focus --boundaries-action wrap-around-the-workspace down'    # Focus on below window
+
+alt-shift-left = 'swap --wrap-around left'    # Swap window to the left
+alt-shift-right = 'swap --wrap-around right'  # Swap window to the right
+alt-shift-up = 'swap --wrap-around up'        # Swap window up
+alt-shift-down = 'swap --wrap-around down'    # Swap window down
+
+# --- groups and mixed splits --------------------------------------------
+# join-with is the tool for Hyprland-style mixed layouts: it boxes the
+# focused window together with its neighbour, and the
+# opposite-orientation normalization flips the new box to the other axis,
+# so a row becomes a stack automatically. Verified: 3 windows h_tiles ->
+# alt-cmd-left -> h_tiles v_tiles v_tiles (945x1033 + two 945x512).
+alt-g = 'layout tiles accordion'          # Toggle window grouping (tiles <-> accordion)
+alt-cmd-g = 'flatten-workspace-tree'      # Move window out of group (flattens workspace)
+alt-cmd-left = 'join-with left'           # Stack with window to the left (makes a mixed h/v split)
+alt-cmd-right = 'join-with right'         # Stack with window to the right (makes a mixed h/v split)
+alt-cmd-up = 'join-with up'               # Stack with window above (makes a mixed h/v split)
+alt-cmd-down = 'join-with down'           # Stack with window below (makes a mixed h/v split)
+alt-cmd-tab = 'focus --boundaries-action wrap-around-the-workspace dfs-next'        # Next window in group
+alt-shift-cmd-tab = 'focus --boundaries-action wrap-around-the-workspace dfs-prev'  # Previous window in group
+alt-ctrl-left = 'focus --boundaries-action wrap-around-the-workspace dfs-prev'      # Move grouped window focus left
+alt-ctrl-right = 'focus --boundaries-action wrap-around-the-workspace dfs-next'     # Move grouped window focus right
+alt-cmd-1 = 'focus --dfs-index 0'  # Switch to group window 1
+alt-cmd-2 = 'focus --dfs-index 1'  # Switch to group window 2
+alt-cmd-3 = 'focus --dfs-index 2'  # Switch to group window 3
+alt-cmd-4 = 'focus --dfs-index 3'  # Switch to group window 4
+alt-cmd-5 = 'focus --dfs-index 4'  # Switch to group window 5
+
+# --- resize -------------------------------------------------------------
+alt-minus = 'resize smart -100'                      # Expand window left
+alt-equal = 'resize smart +100'                      # Shrink window left
+alt-shift-minus = 'resize smart-opposite -100'       # Shrink window up
+alt-shift-equal = 'resize smart-opposite +100'       # Expand window down
+alt-cmd-minus = 'resize smart -25'                   # Expand window left a little
+alt-cmd-equal = 'resize smart +25'                   # Shrink window left a little
+alt-shift-cmd-minus = 'resize smart-opposite -25'    # Shrink window up a little
+alt-shift-cmd-equal = 'resize smart-opposite +25'    # Expand window down a little
+alt-ctrl-minus = 'resize smart -300'                 # Expand window left a lot
+alt-ctrl-equal = 'resize smart +300'                 # Shrink window left a lot
+alt-ctrl-shift-minus = 'resize smart-opposite -300'  # Shrink window up a lot
+alt-ctrl-shift-equal = 'resize smart-opposite +300'  # Expand window down a lot
+
+# --- workspaces ---------------------------------------------------------
+alt-1 = 'workspace 1'   # Switch to workspace 1
+alt-2 = 'workspace 2'   # Switch to workspace 2
+alt-3 = 'workspace 3'   # Switch to workspace 3
+alt-4 = 'workspace 4'   # Switch to workspace 4
+alt-5 = 'workspace 5'   # Switch to workspace 5
+alt-6 = 'workspace 6'   # Switch to workspace 6
+alt-7 = 'workspace 7'   # Switch to workspace 7
+alt-8 = 'workspace 8'   # Switch to workspace 8
+alt-9 = 'workspace 9'   # Switch to workspace 9
+alt-0 = 'workspace 10'  # Switch to workspace 10
+
+alt-shift-1 = 'move-node-to-workspace --focus-follows-window 1'   # Move window to workspace 1
+alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2'   # Move window to workspace 2
+alt-shift-3 = 'move-node-to-workspace --focus-follows-window 3'   # Move window to workspace 3
+alt-shift-4 = 'move-node-to-workspace --focus-follows-window 4'   # Move window to workspace 4
+alt-shift-5 = 'move-node-to-workspace --focus-follows-window 5'   # Move window to workspace 5
+alt-shift-6 = 'move-node-to-workspace --focus-follows-window 6'   # Move window to workspace 6
+alt-shift-7 = 'move-node-to-workspace --focus-follows-window 7'   # Move window to workspace 7
+alt-shift-8 = 'move-node-to-workspace --focus-follows-window 8'   # Move window to workspace 8
+alt-shift-9 = 'move-node-to-workspace --focus-follows-window 9'   # Move window to workspace 9
+alt-shift-0 = 'move-node-to-workspace --focus-follows-window 10'  # Move window to workspace 10
+
+alt-shift-cmd-1 = 'move-node-to-workspace 1'   # Move window silently to workspace 1
+alt-shift-cmd-2 = 'move-node-to-workspace 2'   # Move window silently to workspace 2
+alt-shift-cmd-3 = 'move-node-to-workspace 3'   # Move window silently to workspace 3
+alt-shift-cmd-4 = 'move-node-to-workspace 4'   # Move window silently to workspace 4
+alt-shift-cmd-5 = 'move-node-to-workspace 5'   # Move window silently to workspace 5
+alt-shift-cmd-6 = 'move-node-to-workspace 6'   # Move window silently to workspace 6
+alt-shift-cmd-7 = 'move-node-to-workspace 7'   # Move window silently to workspace 7
+alt-shift-cmd-8 = 'move-node-to-workspace 8'   # Move window silently to workspace 8
+alt-shift-cmd-9 = 'move-node-to-workspace 9'   # Move window silently to workspace 9
+alt-shift-cmd-0 = 'move-node-to-workspace 10'  # Move window silently to workspace 10
+
+alt-tab = 'workspace --wrap-around next'        # Next workspace
+alt-shift-tab = 'workspace --wrap-around prev'  # Previous workspace
+alt-ctrl-tab = 'workspace-back-and-forth'       # Former workspace
+
+alt-s = 'workspace --auto-back-and-forth S'         # Toggle scratchpad
+alt-backtick = 'workspace --auto-back-and-forth S'  # Toggle scratchpad
+alt-cmd-s = 'move-node-to-workspace S'              # Move window to scratchpad
+alt-shift-backtick = 'move-node-to-workspace S'     # Move window to scratchpad
+
+alt-shift-cmd-left = 'move-workspace-to-monitor --wrap-around prev'   # Move workspace to left monitor
+alt-shift-cmd-right = 'move-workspace-to-monitor --wrap-around next'  # Move workspace to right monitor
+alt-shift-cmd-up = 'move-workspace-to-monitor --wrap-around up'       # Move workspace to up monitor
+alt-shift-cmd-down = 'move-workspace-to-monitor --wrap-around down'   # Move workspace to down monitor
+
+# Omarchy's CTRL+ALT+TAB would be ctrl-alt-tab, which is the SAME chord as
+# alt-ctrl-tab (former workspace). Next-monitor moves to Ctrl+Cmd+Tab.
+ctrl-cmd-tab = 'focus-monitor --wrap-around next'        # Focus on next monitor
+ctrl-cmd-shift-tab = 'focus-monitor --wrap-around prev'  # Focus on previous monitor
+
+# --- meta ---------------------------------------------------------------
+alt-shift-r = 'reload-config'         # Reload config
+alt-shift-semicolon = 'mode service'  # Service mode (esc r b f backspace)
+
+[mode.service.binding]
+esc = ['reload-config', 'mode main']
+r = ['flatten-workspace-tree', 'mode main']
+b = ['balance-sizes', 'mode main']
+f = ['layout floating tiling', 'mode main']
+backspace = ['close-all-windows-but-current', 'mode main']
+alt-shift-left = ['join-with left', 'mode main']
+alt-shift-right = ['join-with right', 'mode main']
+alt-shift-up = ['join-with up', 'mode main']
+alt-shift-down = ['join-with down', 'mode main']

@@ -1,0 +1,3 @@
+#!/bin/bash
+# PRINT-equivalent (F13). Interactive region capture to ~/Pictures.
+exec /usr/sbin/screencapture -i "$HOME/Pictures/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png"

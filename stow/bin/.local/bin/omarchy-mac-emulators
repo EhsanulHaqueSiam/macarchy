@@ -1,0 +1,16 @@
+#!/bin/bash
+# Start / stop the mobile emulators on demand.  omarchy-mac-emulators ios|android|both|stop|status
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+IOS_UDID=9EB8B6EF-6F10-4040-BFE8-480BF0A45D0E
+A="$ANDROID_HOME/platform-tools/adb"
+case "${1:-status}" in
+  ios)     xcrun simctl boot "$IOS_UDID" 2>/dev/null; open -a Simulator ;;
+  android) pgrep -f "emulator -avd pixel9" >/dev/null || \
+             nohup "$ANDROID_HOME/emulator/emulator" -avd pixel9 -no-audio -no-boot-anim -gpu auto > ~/android-emu.log 2>&1 & ;;
+  both)    "$0" ios; "$0" android ;;
+  stop)    osascript -e "quit app \"Simulator\"" 2>/dev/null
+           xcrun simctl shutdown all 2>/dev/null
+           "$A" -s emulator-5554 emu kill 2>/dev/null; echo stopped ;;
+  status)  printf "ios     : %s\n" "$(xcrun simctl list devices booted 2>/dev/null | /usr/bin/grep -c Booted) booted"
+           printf "android : %s\n" "$($A devices 2>/dev/null | /usr/bin/grep -c "^emulator") running" ;;
+esac

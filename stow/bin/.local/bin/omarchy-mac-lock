@@ -1,0 +1,5 @@
+#!/bin/bash
+# SUPER+ESCAPE: lock the screen. macOS 26 removed CGSession from Menu Extras,
+# so this uses the system lock shortcut. With fast user switching on, the
+# resulting lock screen also offers the other accounts.
+exec osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'

@@ -1,0 +1,3 @@
+#!/bin/bash
+# SUPER+CTRL+E: macOS emoji picker (Ctrl+Cmd+Space).
+osascript -e 'tell application "System Events" to key code 49 using {control down, command down}'

@@ -1,0 +1,97 @@
+tap "asmvik/formulae", "https://github.com/asmvik/homebrew-formulae.git"
+tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
+tap "lizardbyte/homebrew"
+tap "nikitabobko/tap"
+tap "smudge/smudge"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Get/set bluetooth power and discoverable state
+brew "blueutil"
+# Resource monitor. C++ version and continuation of bashtop and bpytop
+brew "btop"
+# Dependency manager for Cocoa projects
+brew "cocoapods"
+# Utility to configure multi-display resolutions and arrangements
+brew "displayplacer"
+# More intuitive version of du in rust
+brew "dust"
+# Modern, maintained replacement for ls
+brew "eza"
+# Like neofetch, but much faster because written mostly in C
+brew "fastfetch"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# GitHub command-line tool
+brew "gh"
+# Tool for glamorous shell scripts
+brew "gum"
+# Agent multiplexer that lives in your terminal
+brew "herdr"
+# Tools and libraries to manipulate images in select formats
+brew "imagemagick"
+# Lightweight and flexible command-line JSON processor
+brew "jq"
+# Lazier way to manage everything docker
+brew "lazydocker"
+# Simple terminal UI for git commands
+brew "lazygit"
+# Package manager for the Lua programming language
+brew "luarocks"
+# Mac App Store command-line interface
+brew "mas"
+# Polyglot runtime manager (asdf rust clone)
+brew "mise"
+# Remote terminal application
+brew "mosh"
+# Media player based on MPlayer and mplayer2
+brew "mpv"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
+# Development kit for the Java programming language
+brew "openjdk@21"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
+# Cross-shell prompt for astronauts
+brew "starship"
+# Change macOS audio source from the command-line
+brew "switchaudio-osx"
+# Easiest, most secure way to use WireGuard and 2FA
+brew "tailscale"
+# Simplified and community-driven man pages
+brew "tldr"
+# Terminal multiplexer
+brew "tmux"
+# Watch files and take action when they change
+brew "watchman"
+# Shell extension to navigate your filesystem faster
+brew "zoxide"
+# A window border system for macOS
+brew "felixkratz/formulae/borders", trusted: true
+# Custom macOS statusbar with shell plugin, interaction and graph support
+brew "felixkratz/formulae/sketchybar", trusted: true
+# A CLI for configuring 'Night Shift' on macOS 🌕🌖🌗🌘🌑
+brew "smudge/smudge/nightlight", trusted: true
+# AeroSpace is an i3-like tiling window manager for macOS
+cask "nikitabobko/tap/aerospace", trusted: true
+# Command-line tools for building and debugging Android apps
+cask "android-commandlinetools"
+cask "font-jetbrains-mono-nerd-font"
+cask "font-symbols-only-nerd-font"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
+# Open-source cross-platform alternative to AirDrop
+cask "localsend"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
+# Replacement for Docker Desktop
+cask "orbstack"
+# Instant messaging application focusing on security
+cask "signal"
+mas "GarageBand", id: 682658836
+mas "iMovie", id: 408981434
+mas "Keynote", id: 361285480
+mas "Numbers", id: 361304891
+mas "Pages", id: 361309726
+mas "Xcode", id: 497799835

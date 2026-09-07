@@ -1,0 +1,4 @@
+#!/bin/sh
+# SUPER+CTRL+I: toggle idle lock/sleep prevention via caffeinate.
+if pgrep -x caffeinate >/dev/null; then pkill -x caffeinate; osascript -e 'display notification "Idle lock enabled" with title "Omarchy"'
+else nohup caffeinate -dims >/dev/null 2>&1 & osascript -e 'display notification "Idle lock disabled" with title "Omarchy"'; fi

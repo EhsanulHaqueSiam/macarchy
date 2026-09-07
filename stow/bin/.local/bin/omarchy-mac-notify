@@ -1,0 +1,32 @@
+#!/bin/bash
+# Omarchy's SUPER+comma family. macOS has no notification API, so this drives
+# Notification Centre through the Accessibility tree.
+case "${1:-dismiss}" in
+  dismiss) osascript -e 'tell application "System Events" to tell process "NotificationCenter"
+      if exists window 1 then
+        try
+          click button "Close" of window 1
+        on error
+          key code 53
+        end try
+      end if
+    end tell' 2>/dev/null ;;
+  all)     osascript -e 'tell application "System Events" to tell process "NotificationCenter"
+      repeat 12 times
+        if not (exists window 1) then exit repeat
+        try
+          click button "Clear" of window 1
+        on error
+          try
+            click button "Close" of window 1
+          on error
+            exit repeat
+          end try
+        end try
+      end repeat
+    end tell' 2>/dev/null ;;
+  invoke)  osascript -e 'tell application "System Events" to tell process "NotificationCenter"
+      if exists window 1 then click window 1
+    end tell' 2>/dev/null ;;
+  history) open "x-apple.systempreferences:com.apple.Notifications-Settings.extension" ;;
+esac

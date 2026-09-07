@@ -1,0 +1,3 @@
+#!/bin/bash
+# SUPER+CTRL+X: Mission Control (F9 / key code 101).
+exec osascript -e 'tell application "System Events" to key code 101'

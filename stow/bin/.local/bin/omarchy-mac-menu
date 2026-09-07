@@ -1,0 +1,12 @@
+#!/bin/bash
+c=$(osascript -e 'choose from list {"Lock","Sleep","Restart","Shut Down","Log Out","Relaunch WM"} with title "System" with prompt "System"' 2>/dev/null)
+case "$c" in
+  Lock)          "$HOME/.local/bin/omarchy-mac-lock" ;;
+  Sleep)         pmset sleepnow ;;
+  Restart)       osascript -e 'tell app "System Events" to restart' ;;
+  "Shut Down")   osascript -e 'tell app "System Events" to shut down' ;;
+  "Log Out")     osascript -e 'tell app "System Events" to log out' ;;
+  "Relaunch WM") killall AeroSpace; open -a AeroSpace
+                 /opt/homebrew/bin/brew services restart borders
+                 /opt/homebrew/bin/sketchybar --reload ;;
+esac

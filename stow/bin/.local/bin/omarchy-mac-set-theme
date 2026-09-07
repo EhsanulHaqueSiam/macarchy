@@ -1,0 +1,22 @@
+#!/bin/bash
+# Apply one Omarchy theme across Ghostty, btop, borders, SketchyBar and the wallpaper.
+set -e
+name="$1"; T="$HOME/.local/share/omarchy/themes/$name"
+[ -d "$T" ] || { echo "no such theme: $name" >&2; exit 1; }
+mkdir -p "$HOME/.local/state/omarchy/current"
+rm -rf "$HOME/.local/state/omarchy/current/theme"
+cp -R "$T" "$HOME/.local/state/omarchy/current/theme"
+printf '%s\n' "$name" > "$HOME/.local/state/omarchy/current/theme.name"
+cp "$T/ghostty.conf" "$HOME/.config/ghostty/themes/omarchy" 2>/dev/null || true
+sed -i '' 's/^theme = .*/theme = omarchy/' "$HOME/.config/ghostty/config" 2>/dev/null || true
+[ -f "$T/btop.theme" ] && cp "$T/btop.theme" "$HOME/.config/btop/themes/omarchy.theme"
+# wallpapers -> png, then set the first one
+D="$HOME/.config/omarchy-mac/backgrounds"; mkdir -p "$D"; rm -f "$D"/*
+for f in "$T"/backgrounds/*; do
+  case "$f" in *.png) cp "$f" "$D/";; *) sips -s format png "$f" --out "$D/$(basename "${f%.*}").png" >/dev/null 2>&1;; esac
+done
+first=$(ls "$D"/*.png 2>/dev/null | head -1)
+[ -n "$first" ] && osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"$first\""
+echo 0 > "$HOME/.config/omarchy-mac/bg.index"
+"$HOME/.local/bin/omarchy-mac-colors"
+osascript -e "display notification \"$name\" with title \"Theme applied\""

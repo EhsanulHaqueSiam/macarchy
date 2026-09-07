@@ -1,0 +1,4 @@
+#!/bin/bash
+# Omarchy's SUPER+SHIFT+W (Omawrite): a dated scratch note in nvim.
+d="$HOME/Documents/notes"; mkdir -p "$d"
+exec open -na Ghostty --args -e /bin/zsh -lic "nvim '+normal G' '+startinsert' \"$d/$(date +%Y-%m-%d).md\""

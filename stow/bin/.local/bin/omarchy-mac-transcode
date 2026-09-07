@@ -1,0 +1,57 @@
+#!/bin/bash
+# Omarchy's SUPER+CTRL+PERIOD "Transcode pictures and videos for sharing".
+#
+# Encoder settings are copied verbatim from omarchy/bin/omarchy-transcode so a
+# file shrunk here matches what Omarchy produces. Only the pickers differ:
+# osascript instead of a fuzzy finder, matching omarchy-mac-capture's style.
+set -uo pipefail
+
+note(){ osascript -e "display notification \"$1\" with title \"Transcode\"" >/dev/null 2>&1; }
+pick(){ osascript -e "choose from list {$1} with title \"Transcode\" with prompt \"$2\"" 2>/dev/null; }
+
+input=$(osascript -e 'POSIX path of (choose file with prompt "Transcode which file?")' 2>/dev/null)
+[ -z "$input" ] && exit 0
+
+case "$(file -b --mime-type "$input")" in
+  image/*) formats='"jpg","png"'; resolutions='"high","medium","low"'; kind=picture ;;
+  video/*) formats='"mp4","gif"'; resolutions='"4k","1080p","720p"';   kind=video ;;
+  *) note "Unsupported file type"; exit 1 ;;
+esac
+
+format=$(pick "$formats" "Output format?")
+[ -z "$format" ] || [ "$format" = "false" ] && exit 0
+resolution=$(pick "$resolutions" "Resolution?")
+[ -z "$resolution" ] || [ "$resolution" = "false" ] && exit 0
+
+dir=$(dirname "$input"); base=$(basename "$input")
+output="$dir/${base%.*}-$resolution.$format"
+
+note "Working on $(basename "$output")"
+if [ "$kind" = picture ]; then
+  case "$resolution" in high) r='3160x>' ;; medium) r='2160x>' ;; low) r='1080x>' ;; esac
+  case "$format" in
+    jpg) magick "$input" -resize "$r" -quality 85 -strip "$output" ;;
+    png) magick "$input" -resize "$r" -strip \
+           -define png:compression-filter=5 -define png:compression-level=9 \
+           -define png:compression-strategy=1 -define png:exclude-chunk=all "$output" ;;
+  esac
+else
+  case "$resolution" in 4k) s='scale=-2:2160' ;; 1080p) s='scale=-2:1080' ;; 720p) s='scale=-2:720' ;; esac
+  case "$format" in
+    mp4) if [ "$resolution" = 4k ]; then
+           ffmpeg -y -i "$input" -vf "$s" -c:v libx265 -preset slow -crf 24 -c:a aac -b:a 192k -movflags +faststart "$output"
+         else
+           ffmpeg -y -i "$input" -vf "$s" -c:v libx264 -preset fast -crf 23 -c:a aac -b:a 192k -movflags +faststart "$output"
+         fi ;;
+    gif) ffmpeg -y -i "$input" -vf "fps=10,$s:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" "$output" ;;
+  esac
+fi
+
+if [ -s "$output" ]; then
+  # Omarchy puts the result on the clipboard as a file URI; pbcopy is the analog.
+  printf '%s' "$output" | pbcopy
+  note "Done: $(basename "$output") ($(du -h "$output" | cut -f1)) - path copied"
+  open -R "$output"
+else
+  note "Failed - see Console for ffmpeg/magick output"; exit 1
+fi

@@ -1,0 +1,4 @@
+#!/bin/bash
+# SUPER+K: searchable keybindings, generated live from ~/.aerospace.toml.
+exec open -na Ghostty --args -e /bin/zsh -lic \
+  "~/.local/bin/omarchy-mac-keys-gen | fzf --ansi --reverse --prompt=\"keybinding> \" --header=\"Omarchy on macOS\" >/dev/null"

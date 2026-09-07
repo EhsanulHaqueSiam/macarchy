@@ -1,0 +1,158 @@
+# ~/.config/skhd/skhdrc - Omarchy on macOS: the LAUNCHER/UTILITY half.
+#
+#   alt (⌥) = Omarchy SUPER.   cmd (⌘) = Hyprland's ALT.   ctrl = CTRL.
+#
+# OWNERSHIP - this file and ~/.aerospace.toml are strictly disjoint:
+#   AeroSpace  = native window/workspace commands (no process spawn).
+#   skhd       = anything that runs a program, plus key synthesis (⌥C/⌥V/⌥X).
+# Never bind a chord in both or it fires twice. `omarchy-mac-doctor` checks this.
+#
+# Ported 1:1 from ~/.local/share/omarchy/default/hypr/bindings/{applications,
+# clipboard,utilities,media}.lua unless the trailing comment says otherwise.
+# The `# comment` after each binding is its description in ⌥K.
+#
+# skhd hot-reloads this file on save (no .shell directive in 0.3.9).
+# Symbol keys use raw macOS keycodes:
+#   0x2B = comma   0x2F = period   0x2C = slash
+
+# --- clipboard ----------------------------------------------------------
+# Omarchy's universal copy/paste/cut. `skhd -k` synthesizes the chord through
+# the same event tap in ~1ms; the old osascript keystroke took ~250ms and
+# needed Accessibility. macOS terminals use cmd-c/v like everything else, so
+# Omarchy's terminal CTRL+Insert special case has no analog here.
+alt - c : /opt/homebrew/bin/skhd -k "cmd - c"  # Universal copy
+alt - v : /opt/homebrew/bin/skhd -k "cmd - v"  # Universal paste
+alt - x : /opt/homebrew/bin/skhd -k "cmd - x"  # Universal cut
+alt + ctrl - v : /usr/bin/open raycast://extensions/raycast/clipboard-history/clipboard-history  # Clipboard manager
+
+# --- applications -------------------------------------------------------
+alt - return : /usr/bin/open -na Ghostty  # Terminal
+alt + cmd - return : ~/.local/bin/omarchy-mac-tmux  # Tmux
+alt + ctrl - return : ~/.local/bin/omarchy-mac-run herdr  # Herdr
+alt + shift - return : /usr/bin/open -a Zen  # Browser
+alt + shift - b : /usr/bin/open -a Zen  # Browser
+alt + shift + cmd - b : /usr/bin/open -na Zen --args --private-window  # Browser (private)
+alt + shift - f : /usr/bin/open ~  # File manager
+alt + shift + cmd - f : /usr/bin/open .  # File manager (cwd)
+alt + shift - n : ~/.local/bin/omarchy-mac-run nvim  # Editor
+alt + shift - m : /usr/bin/open -a Music  # Music
+alt + shift + cmd - m : ~/.local/bin/omarchy-mac-run "command -v cliamp >/dev/null && cliamp || open -a Music"  # Music TUI
+alt + shift - d : ~/.local/bin/omarchy-mac-run lazydocker  # Docker
+alt + shift - g : /usr/bin/open -a Signal  # Signal
+alt + shift - o : /usr/bin/open -a Obsidian  # Obsidian
+alt + shift - w : ~/.local/bin/omarchy-mac-note  # Omawrite (daily note)
+alt + shift - 0x2C : /usr/bin/open -a Passwords  # Passwords
+alt + shift + ctrl - a : ~/.local/bin/omarchy-mac-run "claude --permission-mode auto"  # Agent
+
+# --- web apps -----------------------------------------------------------
+alt + shift - a : ~/.local/bin/omarchy-mac-webapp https://chatgpt.com  # ChatGPT
+alt + shift + cmd - a : ~/.local/bin/omarchy-mac-webapp https://grok.com  # Grok
+alt + shift - c : ~/.local/bin/omarchy-mac-webapp https://app.hey.com/calendar/weeks/  # Calendar
+alt + shift - e : ~/.local/bin/omarchy-mac-webapp https://app.hey.com  # Email
+alt + shift + cmd - e : ~/.local/bin/omarchy-mac-webapp "https://app.hey.com/messages/new?display=standalone&new_window=true"  # New email
+alt + shift - y : ~/.local/bin/omarchy-mac-webapp https://youtube.com/  # YouTube
+alt + shift + cmd - g : ~/.local/bin/omarchy-mac-webapp https://web.whatsapp.com/  # WhatsApp
+alt + shift + ctrl - g : ~/.local/bin/omarchy-mac-webapp https://messages.google.com/web/conversations  # Google Messages
+alt + shift - p : ~/.local/bin/omarchy-mac-webapp https://photos.google.com/  # Google Photos
+alt + shift - s : ~/.local/bin/omarchy-mac-webapp https://maps.google.com/  # Google Maps
+alt + shift - x : ~/.local/bin/omarchy-mac-webapp https://x.com/  # X
+alt + shift + cmd - x : ~/.local/bin/omarchy-mac-webapp https://x.com/compose/post  # X Post
+
+# --- menus --------------------------------------------------------------
+alt - space : /usr/bin/open -a Raycast  # Omarchy menu
+alt + cmd - space : /usr/bin/open raycast://extensions/raycast/raycast/search-applications  # Apps menu
+alt - escape : ~/.local/bin/omarchy-mac-menu  # System menu
+alt - k : ~/.local/bin/omarchy-mac-keys  # Keybindings
+alt + cmd - k : ~/.local/bin/omarchy-mac-run "tmux list-keys -N | less -R"  # Tmux keybindings
+alt + ctrl - k : ~/.local/bin/omarchy-mac-run "herdr --help | less -R"  # Herdr keybindings
+alt + ctrl - c : ~/.local/bin/omarchy-mac-capture  # Capture menu
+alt + ctrl - o : /usr/bin/open x-apple.systempreferences:com.apple.ControlCenter-Settings.extension  # Toggle menu
+alt + ctrl - h : /usr/bin/open -a "System Information"  # Hardware menu
+alt + ctrl - e : ~/.local/bin/omarchy-mac-emoji  # Emojis
+alt + ctrl - q : /usr/bin/open -a Calculator  # Calculator
+alt + ctrl - s : /usr/bin/open -a AirDrop  # Share (AirDrop)
+
+# --- panels -------------------------------------------------------------
+alt + ctrl - a : /usr/bin/open x-apple.systempreferences:com.apple.Sound-Settings.extension  # Audio
+alt + ctrl - b : /usr/bin/open x-apple.systempreferences:com.apple.BluetoothSettings  # Bluetooth
+alt + ctrl - w : /usr/bin/open x-apple.systempreferences:com.apple.Network-Settings.extension  # Network
+alt + ctrl - d : /usr/bin/open x-apple.systempreferences:com.apple.Displays-Settings.extension  # Display
+alt + ctrl + cmd - d : /usr/bin/open -a Calendar  # Calendar
+alt + ctrl - p : ~/.local/bin/omarchy-mac-session  # Power
+alt + ctrl - t : ~/.local/bin/omarchy-mac-run btop  # Activity
+
+# --- bar panels ---------------------------------------------------------
+# Omarchy's SUPER+CTRL+<n> counts the panels in the bar's right section, left
+# to right, so the number matches the icon you would point at.
+alt + ctrl - 1 : /usr/bin/open x-apple.systempreferences:com.apple.BluetoothSettings  # Bar panel 1 (bluetooth)
+alt + ctrl - 2 : /usr/bin/open x-apple.systempreferences:com.apple.Network-Settings.extension  # Bar panel 2 (network)
+alt + ctrl - 3 : /usr/bin/open x-apple.systempreferences:com.apple.Sound-Settings.extension  # Bar panel 3 (audio)
+alt + ctrl - 4 : /usr/bin/open x-apple.systempreferences:com.apple.Displays-Settings.extension  # Bar panel 4 (display)
+alt + ctrl - 5 : ~/.local/bin/omarchy-mac-session  # Bar panel 5 (power)
+
+# --- notifications ------------------------------------------------------
+alt - 0x2B : ~/.local/bin/omarchy-mac-notify dismiss  # Dismiss last notification
+alt + shift - 0x2B : ~/.local/bin/omarchy-mac-notify all  # Dismiss all notifications
+alt + ctrl - 0x2B : /usr/bin/shortcuts run "Toggle Do Not Disturb"  # Toggle silencing notifications
+alt + cmd - 0x2B : ~/.local/bin/omarchy-mac-notify invoke  # Invoke last notification
+alt + shift + cmd - 0x2B : ~/.local/bin/omarchy-mac-notify history  # Notification history
+
+# --- toggles ------------------------------------------------------------
+alt + shift - space : ~/.config/sketchybar/plugins/bar-toggle.sh  # Toggle top bar
+alt + shift - backspace : ~/.local/bin/omarchy-mac-gaps  # Toggle window gaps
+alt + ctrl - space : ~/.local/bin/omarchy-mac-bg  # Background switcher
+alt + shift + ctrl - space : ~/.local/bin/omarchy-mac-theme  # Theme menu
+alt + ctrl - i : ~/.local/bin/omarchy-mac-idle; /opt/homebrew/bin/sketchybar --trigger indicators_refresh  # Toggle locking on idle
+alt + ctrl - n : ~/.local/bin/omarchy-mac-nightlight; /opt/homebrew/bin/sketchybar --trigger indicators_refresh  # Toggle nightlight
+alt + ctrl - l : ~/.local/bin/omarchy-mac-lock  # Lock system
+alt - home : ~/.local/bin/omarchy-mac-width restore  # Restore window width
+alt + cmd - home : ~/.local/bin/omarchy-mac-width save  # Save window width
+alt - 0x2C : ~/.local/bin/omarchy-mac-scale up  # Monitor scaling up
+alt + cmd - 0x2C : ~/.local/bin/omarchy-mac-scale down  # Monitor scaling down
+alt + ctrl - 0x2F : ~/.local/bin/omarchy-mac-transcode  # Transcode
+alt + ctrl - z : ~/.local/bin/omarchy-mac-zoom in  # Zoom in
+alt + ctrl + cmd - z : ~/.local/bin/omarchy-mac-zoom reset  # Reset zoom
+
+# --- reminders and toasts -----------------------------------------------
+alt + ctrl - r : /usr/bin/open -a Reminders  # Set reminder
+alt + ctrl + cmd - r : /usr/bin/open -a Reminders  # Show reminders
+alt + shift + ctrl - r : /usr/bin/open -a Reminders  # Clear reminders
+alt + ctrl + cmd - t : ~/.local/bin/omarchy-mac-info time  # Show time
+alt + ctrl + cmd - b : ~/.local/bin/omarchy-mac-info power  # Show battery remaining
+alt + ctrl + cmd - w : ~/.local/bin/omarchy-mac-info weather  # Toggle weather
+
+# --- capture (F13 sits where PrintScreen does on a full-size Apple keyboard) --
+f13 : ~/.local/bin/omarchy-mac-screenshot  # Screenshot
+cmd - f13 : /usr/bin/open -a Screenshot  # Screenrecording
+alt - f13 : /usr/bin/open -a "Digital Color Meter"  # Color picker
+alt + ctrl - f13 : /usr/bin/shortcuts run "OCR Screenshot"  # Extract text (OCR) from screenshot
+
+# --- media --------------------------------------------------------------
+shift - mute : /opt/homebrew/bin/SwitchAudioSource -n  # Switch audio output
+
+# --- macOS extras (no Omarchy equivalent) -------------------------------
+# The macOS menu bar is hidden for the bar, so this is how you reach an app's
+# File/Edit/View menus from the keyboard: Raycast searches every menu item of
+# the focused app. macOS's own Help-menu search (⌘⇧/) also still works.
+alt + cmd - m : ~/.local/bin/omarchy-mac-menu-bar  # App menu bar (File/Edit/View...)
+alt + ctrl - x : ~/.local/bin/omarchy-mac-mission-control  # Mission Control
+alt + ctrl + cmd - s : /usr/bin/open -a "Screen Sharing"  # Screen Sharing
+alt + shift + ctrl - o : /opt/homebrew/bin/SwitchAudioSource -n  # Next audio output
+alt + shift + cmd - 0x2C : /usr/bin/open x-apple.systempreferences:com.apple.Keyboard-Settings.extension  # Keyboard settings
+
+# --- swallowing a macOS chord -------------------------------------------
+# skhd's event tap sits ahead of the system, so binding a chord to /bin/true
+# consumes it and macOS never sees it. Use this if a macOS default ever fights
+# an Omarchy binding, e.g. to kill Cmd+H (hide window):
+#   cmd - h : /bin/true
+
+# --- Omarchy's ALT+TAB --------------------------------------------------
+# Omarchy cycles WINDOWS with ALT+TAB. With the Win=SUPER swap in place the
+# physical Alt key sends Cmd, so binding cmd-tab puts window cycling exactly
+# where Omarchy has it. skhd's event tap sits ahead of the system, so this
+# genuinely takes Cmd+Tab away from the macOS app switcher - verified: focus
+# cycled 602 -> 594 -> 602 across two windows. Reach other workspaces with
+# ⌥Tab / ⌥1-0, and apps with ⌥Space, the way Omarchy does.
+# Comment both lines out to hand Cmd+Tab back to macOS.
+cmd - tab : /opt/homebrew/bin/aerospace focus --boundaries-action wrap-around-the-workspace dfs-next
+cmd + shift - tab : /opt/homebrew/bin/aerospace focus --boundaries-action wrap-around-the-workspace dfs-prev

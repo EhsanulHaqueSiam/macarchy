@@ -1,0 +1,4 @@
+#!/bin/sh
+# SUPER+S: toggle the scratchpad workspace like Hyprland's special:scratchpad.
+cur=$(aerospace list-workspaces --focused)
+if [ "$cur" = "S" ]; then aerospace workspace-back-and-forth; else aerospace workspace S; fi

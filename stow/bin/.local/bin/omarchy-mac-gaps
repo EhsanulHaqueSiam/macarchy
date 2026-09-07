@@ -1,0 +1,20 @@
+#!/bin/bash
+# AeroSpace reads [gaps] only at load, so the only gaps toggle is: rewrite the
+# block and reload. ON = Omarchy (in 10 / out 10 / top 26+10). OFF = zero, but
+# top stays at the bar height so windows never slide under SketchyBar.
+# ponytail: keep these three constants in sync with sketchybarrc's height=26.
+BAR=26; GAP=10; TOP=$((BAR + GAP))
+f="$HOME/.aerospace.toml"
+
+if /usr/bin/grep -qE "^outer\.top *= *$TOP\$" "$f"; then
+  i=0; o=0; t=$BAR          # gaps off
+else
+  i=$GAP; o=$GAP; t=$TOP    # gaps on
+fi
+
+/usr/bin/sed -i '' -E \
+  -e "s/^(inner\.(horizontal|vertical) *=).*/\1 $i/" \
+  -e "s/^(outer\.(left|right|bottom) *=).*/\1 $o/" \
+  -e "s/^(outer\.top *=).*/\1 $t/" "$f"
+
+/opt/homebrew/bin/aerospace reload-config

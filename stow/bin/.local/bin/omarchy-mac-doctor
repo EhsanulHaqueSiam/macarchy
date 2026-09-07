@@ -1,0 +1,88 @@
+#!/bin/bash
+# Health check for the Omarchy-on-macOS rig. Run at login and by hand.
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+ok(){ printf '  ok      %s\n' "$1"; }; bad(){ printf '  MISSING %s\n' "$1"; FAIL=1; }
+FAIL=0
+
+aerospace list-workspaces --focused >/dev/null 2>&1 && ok "aerospace responds" || bad "aerospace (grant Accessibility, then: open -a AeroSpace)"
+pgrep -x skhd >/dev/null && ok "skhd running" || bad "skhd (grant Input Monitoring, then: skhd --restart-service)"
+pgrep -x sketchybar >/dev/null && ok "sketchybar running" || bad "sketchybar (brew services restart sketchybar)"
+# The bar can be legitimately hidden (⌥⇧Space), and sketchybarrc replays that
+# state on every reload - so a stale state file keeps re-hiding it and looks
+# like the bar is broken. Report it rather than fail on it.
+if [ "$(sketchybar --query bar 2>/dev/null | jq -r .hidden)" = "on" ]; then
+  printf '  note    bar is HIDDEN (⌥⇧Space toggles; state at ~/.local/state/sketchybar/hidden)\n'
+else
+  ok "bar visible"
+fi
+
+pgrep -x borders >/dev/null && ok "borders running" || bad "borders (grant Accessibility, then: brew services restart borders)"
+
+# JankyBorders execs bordersrc when started with no arguments, so a bordersrc
+# that never calls `borders` leaves it silently running on stock defaults -
+# no theme colours, no 2px square border. That is exactly how it was found.
+/usr/bin/grep -q 'borders "\${options\[@\]}"\|^borders ' "$HOME/.config/borders/bordersrc" 2>/dev/null \
+  && ok "bordersrc invokes borders" \
+  || bad "bordersrc never calls borders, so it runs on defaults: omarchy-mac-colors"
+
+# `inherit-env-vars = false` means callbacks get ONLY [exec.env-vars]. Without
+# USER, `sketchybar --trigger` aborts with "'env USER' not set!" and the bar
+# stops repainting on any workspace switch that has no focus change to ride on
+# (i.e. switching to an EMPTY workspace). aerospace shows this list for free.
+aerospace list-exec-env-vars 2>/dev/null | /usr/bin/grep -q '^USER=' \
+  && ok "callbacks get USER (sketchybar triggers fire)" \
+  || bad "USER missing from [exec.env-vars]: bar will freeze on empty-workspace switches"
+
+err=$(aerospace reload-config 2>&1 | /usr/bin/grep -c ERROR)
+[ "$err" = "0" ] && ok "aerospace config clean" || bad "aerospace config has $err error(s): aerospace reload-config"
+
+# grep -c prints 0 AND exits 1 when there is no match, so `|| echo 0` would
+# append a second zero and the test below would never pass.
+serr=$(/usr/bin/grep -ci 'error' "/tmp/skhd_$USER.err.log" 2>/dev/null); serr=${serr:-0}
+[ "$serr" = "0" ] && ok "skhd config clean" || bad "skhd config has $serr error line(s): tail /tmp/skhd_$USER.err.log"
+
+# The whole design rests on the two configs being disjoint. A chord bound in
+# both fires twice, which is exactly the bug that retired skhd the first time.
+clash=$(/usr/bin/python3 - <<'PY'
+import re, os
+MODS={'alt','cmd','ctrl','shift'}
+A={'0x2b':'comma','0x2f':'period','0x2c':'slash','return':'enter','escape':'esc','backtick':'grave'}
+def canon(k): k=k.lower(); return A.get(k,k)
+def aero():
+    out=set(); table=None
+    for l in open(os.path.expanduser('~/.aerospace.toml')):
+        s=l.strip()
+        if s.startswith('[') and s.endswith(']'): table=s; continue
+        if table!='[mode.main.binding]': continue
+        m=re.match(r'^([a-z0-9-]+)\s*=',s)
+        if not m: continue
+        p=m.group(1).split('-')
+        out.add((frozenset(x for x in p if x in MODS), canon('-'.join(x for x in p if x not in MODS))))
+    return out
+def skhd():
+    out=set()
+    for l in open(os.path.expanduser('~/.config/skhd/skhdrc')):
+        s=l.strip()
+        if s.startswith('#') or s.startswith('.') or ':' not in s: continue
+        lhs=s.split('#')[0].split(':',1)[0].strip()
+        if not lhs: continue
+        if '-' in lhs:
+            m,_,k=lhs.rpartition('-'); mods=[x.strip() for x in m.split('+') if x.strip()]
+        else: mods,k=[],lhs
+        out.add((frozenset(mods),canon(k.strip())))
+    return out
+for mods,k in sorted(aero()&skhd(), key=str):
+    print('+'.join(sorted(mods))+'-'+k)
+PY
+)
+[ -z "$clash" ] && ok "aerospace/skhd bindings disjoint" || bad "chords bound in BOTH (they will double-fire): $(echo "$clash" | tr '\n' ' ')"
+
+[ "$(defaults read NSGlobalDomain _HIHideMenuBar 2>/dev/null)" = "1" ] && ok "menu bar auto-hide set" || bad "menu bar (Control Center > hide menu bar > Always)"
+[ "$(defaults read com.apple.universalaccess reduceMotion 2>/dev/null)" = "1" ] && ok "reduce motion (snappy workspace switching)" || bad "reduce motion (Settings > Accessibility > Display > Reduce motion)"
+[ "$(defaults read com.apple.spaces spans-displays 2>/dev/null)" = "1" ] && ok "displays share spaces (AeroSpace recommends)" || bad "spans-displays (defaults write com.apple.spaces spans-displays -bool true; killall SystemUIServer)"
+
+nc -z 127.0.0.1 5900 >/dev/null 2>&1 && ok "screen sharing (5900)" || bad "screen sharing (sudo launchctl kickstart -k system/com.apple.screensharing)"
+[ -x "$HOME/.local/bin/omarchy-mac-switch-user" ] && ok "switch-user (bar > power menu)" || bad "switch-user helper missing"
+
+[ $FAIL -eq 0 ] && echo "all good" || osascript -e 'display notification "Run omarchy-mac-doctor in a terminal" with title "Omarchy: something needs attention"'
+exit $FAIL

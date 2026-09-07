@@ -1,0 +1,11 @@
+#!/bin/bash
+# Omarchy's capture menu. osascript's chooser is the zero-dependency picker.
+c=$(osascript -e 'choose from list {"Region","Window","Screen","Region to clipboard","Record screen"} with title "Capture" with prompt "Capture what?"' 2>/dev/null)
+d="$HOME/Pictures/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png"
+case "$c" in
+  Region)              /usr/sbin/screencapture -i "$d" ;;
+  Window)              /usr/sbin/screencapture -iW "$d" ;;
+  Screen)              /usr/sbin/screencapture "$d" ;;
+  "Region to clipboard") /usr/sbin/screencapture -i -c ;;
+  "Record screen")     /usr/sbin/screencapture -v "$HOME/Movies/rec-$(date +%s).mov" ;;
+esac

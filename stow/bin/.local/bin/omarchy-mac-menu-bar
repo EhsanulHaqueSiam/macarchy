@@ -1,0 +1,39 @@
+#!/bin/bash
+# Reach the focused app's File/Edit/View menus while SketchyBar covers the
+# macOS menu bar.
+#
+# SketchyBar sits at CG level 25, above the menu bar's 24, so the auto-hide
+# reveal is hidden behind it. The accessibility API does not care about
+# layering: it can read and click menu items regardless. This is the reliable
+# route, and unlike Raycast it can be verified.
+#
+#   omarchy-mac-menu-bar                 pick a menu, then an item
+#   omarchy-mac-menu-bar File            pick an item from File
+#   omarchy-mac-menu-bar File "New Tab"  click it directly (used by tests)
+set -uo pipefail
+
+app=$(osascript -e 'tell application "System Events" to get name of first process whose frontmost is true' 2>/dev/null)
+[ -z "$app" ] && exit 1
+
+menu=${1:-}
+if [ -z "$menu" ]; then
+  # "Apple" is the  menu; it is reachable but never what someone means here.
+  menus=$(osascript -e "tell application \"System Events\" to tell process \"$app\" to get name of menu bar items of menu bar 1" 2>/dev/null \
+          | tr ',' '\n' | sed 's/^ *//; s/ *$//' | /usr/bin/grep -v '^Apple$' | awk 'NF{printf "\"%s\",", $0}' | sed 's/,$//')
+  [ -z "$menus" ] && { osascript -e "display notification \"$app has no menus\" with title \"Menu\""; exit 1; }
+  menu=$(osascript -e "choose from list {$menus} with title \"$app\" with prompt \"Which menu?\"" 2>/dev/null)
+  [ -z "$menu" ] || [ "$menu" = "false" ] && exit 0
+fi
+
+item=${2:-}
+if [ -z "$item" ]; then
+  # "missing value" is how a separator line comes back; drop those.
+  items=$(osascript -e "tell application \"System Events\" to tell process \"$app\" to get name of menu items of menu 1 of menu bar item \"$menu\" of menu bar 1" 2>/dev/null \
+          | tr ',' '\n' | sed 's/^ *//; s/ *$//' | /usr/bin/grep -v '^missing value$' | awk 'NF{printf "\"%s\",", $0}' | sed 's/,$//')
+  [ -z "$items" ] && { osascript -e "display notification \"No items in $menu\" with title \"Menu\""; exit 1; }
+  item=$(osascript -e "choose from list {$items} with title \"$app > $menu\" with prompt \"Which item?\"" 2>/dev/null)
+  [ -z "$item" ] || [ "$item" = "false" ] && exit 0
+fi
+
+osascript -e "tell application \"System Events\" to tell process \"$app\" to click menu item \"$item\" of menu 1 of menu bar item \"$menu\" of menu bar 1" 2>/dev/null \
+  || osascript -e "display notification \"Could not click $menu > $item\" with title \"Menu\""

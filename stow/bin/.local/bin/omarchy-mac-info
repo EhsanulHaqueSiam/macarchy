@@ -1,0 +1,9 @@
+#!/bin/bash
+# Omarchy's SUPER+CTRL+ALT+T / +B "show time / battery" toasts.
+case "${1:-time}" in
+  time)    osascript -e "display notification \"$(date '+%A, %d %B  %H:%M')\" with title \"Time\"" ;;
+  power)   p=$(pmset -g batt | tail -1 | sed 's/^[[:space:]]*//')
+           [ -z "$p" ] && p="AC power (no battery)"
+           osascript -e "display notification \"$p\" with title \"Power\"" ;;
+  weather) open -a Weather 2>/dev/null || osascript -e 'display notification "Weather app not available" with title "Weather"' ;;
+esac

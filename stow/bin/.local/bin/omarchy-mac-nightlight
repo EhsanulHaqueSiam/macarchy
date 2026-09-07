@@ -1,0 +1,3 @@
+#!/bin/sh
+# Toggle Night Shift (needs: brew install smudge/smudge/nightlight).
+command -v nightlight >/dev/null && nightlight toggle || osascript -e 'display notification "brew install smudge/smudge/nightlight" with title "nightlight missing"'

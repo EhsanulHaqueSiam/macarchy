@@ -1,0 +1,19 @@
+#!/bin/bash
+# Session menu, reachable from the bar. Exists because hiding the macOS menu bar
+# also hides Control Center's user switcher, the only switch-user UI left on macOS 26.
+choice=$(osascript <<'AS'
+tell application "System Events" to activate
+set opts to {"Lock screen", "Switch user (login window)", "Log out", "Sleep display", "Restart", "Shut down"}
+set r to choose from list opts with title "Session" with prompt "What do you want to do?" without multiple selections allowed
+if r is false then return ""
+return item 1 of r
+AS
+)
+case "$choice" in
+  "Lock screen") osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}' ;;
+  "Switch user (login window)") exec "$HOME/.local/bin/omarchy-mac-switch-user" ;;
+  "Log out")     osascript -e 'tell application "System Events" to log out' ;;
+  "Sleep display") pmset displaysleepnow ;;
+  "Restart")     osascript -e 'tell application "System Events" to restart' ;;
+  "Shut down")   osascript -e 'tell application "System Events" to shut down' ;;
+esac

@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+# Render the keybinding sheet straight from the two files that actually bind
+# the keys, so it can never drift:
+#   ~/.aerospace.toml       native window/workspace commands
+#   ~/.config/skhd/skhdrc   anything that runs a program
+# Sections come from the `# --- name ---` headers; the description is the
+# trailing `# comment` on each binding.
+import os, re
+
+AERO = os.path.expanduser("~/.aerospace.toml")
+SKHD = os.path.expanduser("~/.config/skhd/skhdrc")
+BIN = os.path.expanduser("~/.local/bin/omarchy-mac-")
+
+SYM = {"alt": "⌥", "cmd": "⌘", "ctrl": "⌃", "shift": "⇧"}
+ORDER = ["ctrl", "alt", "shift", "cmd"]  # stable print order, not input order
+NAMES = {
+    "enter": "Return", "return": "Return", "esc": "Esc", "escape": "Esc",
+    "space": "Space", "backtick": "`", "0x32": "`", "minus": "-", "equal": "=",
+    "left": "←", "right": "→", "up": "↑", "down": "↓", "tab": "Tab",
+    "backspace": "⌫", "delete": "⌦", "home": "Home", "semicolon": ";",
+    "slash": "/", "0x2c": "/", "comma": ",", "0x2b": ",", "period": ".", "0x2f": ".",
+}
+
+def pretty(mods, key):
+    k = key.lower()
+    k = NAMES.get(k, key.upper() if len(key) == 1 else key)
+    return "".join(SYM[m] for m in ORDER if m in mods) + k
+
+def describe(cmd, note):
+    if note:
+        return note
+    c = cmd.replace("exec-and-forget ", "").replace(BIN, "")
+    c = re.sub(r"^/usr/bin/open (-na |-a )?", "", c)
+    c = re.sub(r"^/?(opt/homebrew/bin|usr/bin|usr/sbin)/", "", c)
+    return re.sub(r"^https?://", "", c)
+
+sections, order = {}, []
+
+def add(sec, mods, key, cmd, note):
+    if sec not in sections:
+        sections[sec] = []
+        order.append(sec)
+    sections[sec].append((pretty(mods, key), describe(cmd, note)))
+
+# ---- aerospace: only [mode.main.binding] -------------------------------
+sec, table = None, None
+for line in open(AERO):
+    s = line.strip()
+    if s.startswith("[") and s.endswith("]"):
+        table = s
+        continue
+    m = re.match(r"^# --- (.+?) -+$", s)
+    if m:
+        sec = m.group(1).strip()
+        continue
+    if table != "[mode.main.binding]" or not sec:
+        continue
+    m = re.match(r"^([a-z0-9-]+)\s*=\s*'([^']*)'\s*(?:#\s*(.*))?$", s)
+    if m:
+        parts = m.group(1).split("-")
+        mods = [p for p in parts if p in SYM]
+        key = "-".join(p for p in parts if p not in SYM)
+        add(sec, mods, key, m.group(2), m.group(3))
+
+# ---- skhd ---------------------------------------------------------------
+sec = None
+for line in open(SKHD):
+    s = line.rstrip("\n")
+    m = re.match(r"^# --- (.+?) -+$", s.strip())
+    if m:
+        sec = m.group(1).strip()
+        continue
+    if not sec or s.strip().startswith("#") or s.strip().startswith(".") or ":" not in s:
+        continue
+    body, _, note = s.partition("#")
+    lhs, _, cmd = body.partition(":")
+    lhs, cmd, note = lhs.strip(), cmd.strip(), note.strip()
+    if not lhs or not cmd:
+        continue
+    if "-" in lhs:
+        mods, _, key = lhs.rpartition("-")
+        mods = [x.strip() for x in mods.split("+") if x.strip()]
+    else:
+        mods, key = [], lhs
+    add(sec, mods, key.strip(), cmd, note)
+
+print("OMARCHY ON MACOS  —  ⌥ = SUPER,  ⌘ = Hyprland ALT,  ⌃ = CTRL")
+print("AeroSpace binds the window manager, skhd binds everything that launches.")
+print("Health: omarchy-mac-doctor")
+for s in order:
+    if not sections[s]:
+        continue
+    print("\n" + s.upper())
+    for k, d in sections[s]:
+        print("  %-22s %s" % (k, d[:64]))
+
+print("""
+MACOS DIVERGENCES (deliberate)
+  Option = SUPER, so macOS Option+arrow word-navigation is gone in text fields.
+  Next monitor is ⌃⌘Tab: Omarchy's CTRL+ALT+TAB is the same physical chord as
+    former-workspace (⌥⌃Tab).
+  Close-all is ⌃⌘⌫ - the Mac key labelled "delete" is backspace.
+  Omarchy's ALT+TAB cycles windows: with Win=SUPER the physical Alt sends Cmd,
+    so Alt+Tab is bound and the macOS app switcher is gone. ⌥Tab reaches other
+    workspaces, ⌥Space reaches apps. Comment the cmd-tab lines in skhdrc to
+    hand Cmd+Tab back.
+  ⌥P is accordion, not pseudo-tile. ⌥O floats but cannot pin.
+  ⌥⌃X is Mission Control; Omarchy's dictation toggle has no CLI on macOS.
+  PRINT is F13. Move any window with ⌃⌘+drag.
+NOT REPRODUCIBLE ON MACOS
+  window transparency (⌥⌫), single-window square aspect, webcam overlay,
+  laptop-display toggle, scroll-to-switch-workspace, true tabbed groups,
+  Hyprland animations.""")

@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# Omarchy's top bar on macOS, widget for widget:
+#   left    omarchy.menu, omarchy.workspaces, + the focused-window title
+#   center  omarchy.indicators, omarchy.clock, omarchy.system-update
+#   right   omarchy.bluetooth, .network, .audio, .monitor, .power
+# (Omarchy also puts omarchy.tray leftmost in the right section; macOS has no
+# equivalent. The title is the one addition Omarchy does not have - it is the
+# only feedback about which window is focused, since Cmd+Tab stays the macOS
+# app switcher. It is event-driven, not the old 2s poll.)
+#
+# height=26 is Style.bar.sizeHorizontal; ~/.aerospace.toml outer.top must stay 26+10=36.
+CONFIG_DIR="$HOME/.config/sketchybar"
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+source "$CONFIG_DIR/theme.sh"
+
+# topmost=on is CG level 25, ABOVE the menu bar's 24. topmost=window is level 3
+# and loses the top 26px to the menu bar - that is the whole overlap bug.
+sketchybar --bar \
+  position=top height=26 y_offset=0 margin=0 \
+  color=$BG padding_left=8 padding_right=8 \
+  topmost=on sticky=on shadow=off border_width=0 corner_radius=0 \
+  blur_radius=0 font_smoothing=on display=all
+
+sketchybar --default \
+  icon.font="$ICONS:Regular:13.0" icon.color=$FG \
+  icon.padding_left=4 icon.padding_right=4 \
+  label.font="$FONT:Regular:12.0" label.color=$FG \
+  label.padding_left=2 label.padding_right=4 \
+  padding_left=2 padding_right=2 \
+  background.drawing=off background.corner_radius=0 background.height=20
+
+# --- left: menu + workspaces --------------------------------------------
+# Omarchy's logo is  from its own bundled "omarchy" font, which does not
+# exist here; the Apple glyph is the macOS-native stand-in.
+sketchybar --add item logo left \
+  --set logo icon="" icon.font="$ICONS:Regular:14.0" icon.color=$FG \
+             icon.padding_left=6 icon.padding_right=10 label.drawing=off \
+             click_script="$HOME/.local/bin/omarchy-mac-menu"
+
+sketchybar --add event aerospace_workspace_change
+# Fired by the ⌥⌃N / ⌥⌃I toggles so the indicator repaints at once
+# instead of waiting out the poll below.
+sketchybar --add event indicators_refresh
+
+# Workspaces are hardcoded 1..10 (+S) to match ⌥1..⌥0 and ⌥S. Enumerating them
+# with `aerospace list-workspaces` here creates ZERO items whenever sketchybar
+# starts before AeroSpace.app, which is the normal boot order under brew services.
+# Omarchy's own widget is exactly this: always 1-5, plus any occupied up to 10.
+for sid in 1 2 3 4 5 6 7 8 9 10 S; do
+  # Omarchy labels workspace 10 as "0", matching the ⌥0 that reaches it.
+  label=$sid; [ "$sid" = "10" ] && label=0
+  sketchybar --add item space.$sid left \
+    --set space.$sid drawing=off icon.drawing=off \
+          label="$label" label.color=$DIM \
+          label.padding_left=7 label.padding_right=7 \
+          padding_left=0 padding_right=0 \
+          click_script="/opt/homebrew/bin/aerospace workspace $sid"
+done
+
+# One invisible driver repaints every pill in a single batched call.
+sketchybar --add item workspaces left \
+  --set workspaces drawing=off updates=on script="$PLUGIN_DIR/workspaces.sh" \
+  --subscribe workspaces aerospace_workspace_change front_app_switched \
+                         space_windows_change display_change system_woke
+
+# AeroSpace's on-focus-changed fires aerospace_workspace_change for a focus
+# change inside a workspace as well, so this needs no update_freq.
+sketchybar --add item title left \
+  --set title icon.drawing=off label.color=$MUTED label.max_chars=60 \
+        label.padding_left=12 script="$PLUGIN_DIR/title.sh" \
+  --subscribe title front_app_switched aerospace_workspace_change \
+                    space_windows_change display_change system_woke
+
+# --- center: indicators, clock, system-update ---------------------------
+sketchybar --add item indicators center \
+  --set indicators drawing=off label.drawing=off update_freq=10 \
+        icon.padding_left=6 icon.padding_right=6 \
+        script="$PLUGIN_DIR/indicators.sh" \
+  --subscribe indicators indicators_refresh system_woke
+
+sketchybar --add item clock center \
+  --set clock icon.drawing=off label.color=$FG update_freq=10 \
+        script="$PLUGIN_DIR/clock.sh" click_script="open -a Calendar"
+
+sketchybar --add item updates center \
+  --set updates drawing=off icon="" icon.color=$ACCENT update_freq=1800 \
+        script="$PLUGIN_DIR/updates.sh" \
+        click_script="$HOME/.local/bin/omarchy-mac-run 'brew upgrade; echo; read -r -p \"done \"'" \
+  --subscribe updates system_woke
+
+# --- right: first added sits furthest right ------------------------------
+# Omarchy's order, left to right, is bluetooth network audio monitor power.
+sketchybar --add item power right \
+  --set power update_freq=60 script="$PLUGIN_DIR/power.sh" \
+        click_script="$HOME/.local/bin/omarchy-mac-session" \
+  --subscribe power power_source_change system_woke
+
+sketchybar --add item monitor right \
+  --set monitor icon="" label.drawing=off \
+        click_script="open 'x-apple.systempreferences:com.apple.Displays-Settings.extension'"
+
+# scroll to change volume, click to mute, right-click for the output picker.
+sketchybar --add item volume right \
+  --set volume script="$PLUGIN_DIR/volume.sh" \
+  --subscribe volume volume_change mouse.clicked mouse.scrolled
+
+# click for the known-network picker and Wi-Fi power, right-click for settings.
+sketchybar --add item wifi right \
+  --set wifi update_freq=30 script="$PLUGIN_DIR/wifi.sh" \
+  --subscribe wifi wifi_change system_woke mouse.clicked
+
+# click for power + paired-device connect/disconnect, right-click for settings.
+sketchybar --add item bluetooth right \
+  --set bluetooth update_freq=60 script="$PLUGIN_DIR/bluetooth.sh" \
+  --subscribe bluetooth mouse.clicked
+
+# Replay the bar-hidden state that a --reload would otherwise drop.
+[ -r "$STATE/hidden" ] && sketchybar --bar hidden="$(cat "$STATE/hidden")"
+
+sketchybar --update

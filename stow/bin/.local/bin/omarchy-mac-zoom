@@ -1,0 +1,8 @@
+#!/bin/bash
+# Omarchy's SUPER+CTRL+Z zoom. Uses the macOS Zoom accessibility shortcuts,
+# which must be enabled in Accessibility > Zoom > "Use keyboard shortcuts to zoom".
+case "${1:-in}" in
+  in)    osascript -e 'tell application "System Events" to keystroke "=" using {command down, option down}' ;;
+  out)   osascript -e 'tell application "System Events" to keystroke "-" using {command down, option down}' ;;
+  reset) osascript -e 'tell application "System Events" to keystroke "8" using {command down, option down}' ;;
+esac

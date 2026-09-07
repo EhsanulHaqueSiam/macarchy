@@ -1,0 +1,8 @@
+#!/bin/bash
+# caffeinate -d holds the display awake; killing it restores normal idle.
+if pkill -x caffeinate; then
+  osascript -e 'display notification "Idle: on" with title "Omarchy"'
+else
+  nohup /usr/bin/caffeinate -d >/dev/null 2>&1 &
+  osascript -e 'display notification "Idle: inhibited" with title "Omarchy"'
+fi

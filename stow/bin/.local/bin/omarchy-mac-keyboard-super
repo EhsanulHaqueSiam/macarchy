@@ -1,0 +1,55 @@
+#!/bin/bash
+# Make a PC keyboard's physical Win key act as Omarchy's SUPER.
+#
+# macOS maps a PC keyboard's Win -> Command and Alt -> Option, so every ⌥
+# binding lands on the physical Alt key instead of on Win, where Omarchy puts
+# SUPER. This swaps Command and Option for the attached keyboard only.
+#
+# The mapping is keyed by the device's vendor/product id and is DISCOVERED, not
+# hardcoded: a re-pair or a firmware bump changes the id and macOS silently
+# drops the old key, which is exactly how this went missing once already.
+#
+#   omarchy-mac-keyboard-super          swap (Win = SUPER, Omarchy parity)
+#   omarchy-mac-keyboard-super reset    back to stock (Alt = SUPER)
+#   omarchy-mac-keyboard-super status   show what is set
+
+# HID usage ids: (usagePage << 32) | usage, keyboard page 0x07.
+L_OPT=30064771298   # 0xE2 Left Alt
+L_CMD=30064771299   # 0xE3 Left GUI
+R_OPT=30064771302   # 0xE6 Right Alt
+R_CMD=30064771303   # 0xE7 Right GUI
+
+pair(){ printf '{HIDKeyboardModifierMappingSrc=%s;HIDKeyboardModifierMappingDst=%s;}' "$1" "$2"; }
+SWAP="($(pair $L_OPT $L_CMD),$(pair $L_CMD $L_OPT),$(pair $R_OPT $R_CMD),$(pair $R_CMD $R_OPT))"
+
+# Every connected keyboard-like HID, as "vendor-product". Falls back to the
+# RAPOO this Mac ships with when nothing is connected (Bluetooth asleep).
+ids=$(ioreg -n IOHIDKeyboard -r -l -w0 2>/dev/null |
+      awk '/"VendorID"/{v=$3} /"ProductID"/{p=$3; if(v&&p) print v"-"p}' | sort -u)
+[ -z "$ids" ] && ids=$(ioreg -c AppleDeviceManagementHIDEventService -r -l -w0 2>/dev/null |
+      awk '/"VendorID"/{v=$3} /"ProductID"/{p=$3; if(v&&p) print v"-"p}' | sort -u)
+[ -z "$ids" ] && { ids="9306-33398"; echo "no keyboard connected; using the known RAPOO id $ids"; }
+
+case "${1:-swap}" in
+  status)
+    found=0
+    for k in $(defaults -currentHost read -g 2>/dev/null | \
+               /usr/bin/grep -o 'com\.apple\.keyboard\.modifiermapping[^" ]*' | sort -u); do
+      echo "  $k"; found=1
+    done
+    [ "$found" = 0 ] && echo "  (no modifier mapping set - Alt is SUPER, Win is Command)"
+    exit 0 ;;
+  reset)
+    for id in $ids; do for n in 0 1 2 3; do
+      defaults -currentHost delete -g "com.apple.keyboard.modifiermapping.$id-$n" 2>/dev/null
+    done; done
+    echo "reset: Alt is SUPER again. Reconnect the keyboard or log out to apply." ;;
+  swap)
+    for id in $ids; do for n in 0 1 2 3; do
+      defaults -currentHost write -g "com.apple.keyboard.modifiermapping.$id-$n" "$SWAP"
+    done; done
+    echo "swapped for: $ids"
+    echo "Win is now SUPER (⌥) and Command moved to the Alt key."
+    echo "Reconnect the keyboard or log out and back in to apply." ;;
+  *) echo "usage: omarchy-mac-keyboard-super [swap|reset|status]" >&2; exit 1 ;;
+esac

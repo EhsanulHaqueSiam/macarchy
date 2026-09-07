@@ -1,0 +1,15 @@
+#!/bin/bash
+# SUPER+ALT+HOME saves the focused window width, SUPER+HOME restores it.
+# AeroSpace has no width memory, so the value is kept on disk.
+S="$HOME/.config/omarchy-mac/window-width"
+A=/opt/homebrew/bin/aerospace
+case "${1:-restore}" in
+  save)
+    w=$("$A" list-windows --focused --format '%{window-width}' 2>/dev/null)
+    [ -n "$w" ] && { printf '%s' "$w" > "$S"; osascript -e "display notification \"${w}px\" with title \"Width saved\""; } ;;
+  restore)
+    [ -r "$S" ] || { "$A" balance-sizes; exit 0; }
+    cur=$("$A" list-windows --focused --format '%{window-width}' 2>/dev/null)
+    tgt=$(cat "$S")
+    [ -n "$cur" ] && [ -n "$tgt" ] && "$A" resize width "$tgt" 2>/dev/null || "$A" balance-sizes ;;
+esac

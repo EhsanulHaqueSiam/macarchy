@@ -1,0 +1,14 @@
+#!/bin/bash
+# Omarchy's SUPER+SLASH monitor scaling. macOS has no scale API, so this cycles
+# the display's resolution modes with displayplacer.
+command -v displayplacer >/dev/null || { osascript -e 'display notification "brew install displayplacer" with title "Monitor scaling"'; exit 1; }
+id=$(displayplacer list | awk '/^Persistent screen id:/{print $4; exit}')
+modes=$(displayplacer list | awk '/^  mode /{print}' | /usr/bin/grep -o 'mode [0-9]*' | awk '{print $2}')
+cur=$(displayplacer list | awk '/<-- current mode/{print}' | /usr/bin/grep -o 'mode [0-9]*' | awk '{print $2}' | head -1)
+set -- $modes; n=$#; i=1
+for m in $modes; do [ "$m" = "$cur" ] && break; i=$((i+1)); done
+case "${1:-up}" in up) i=$((i-1));; down) i=$((i+1));; esac
+[ "$i" -lt 1 ] && i=1; [ "$i" -gt "$n" ] && i=$n
+eval "target=\${$i}"
+displayplacer "id:$id mode:$target" >/dev/null 2>&1 && \
+  osascript -e "display notification \"mode $target\" with title \"Monitor scaling\""

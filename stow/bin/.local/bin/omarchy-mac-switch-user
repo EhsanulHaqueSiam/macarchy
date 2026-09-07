@@ -1,0 +1,10 @@
+#!/bin/bash
+# Return to the login window so any account can sign in.
+# macOS 26 removed the User.menu switcher, and a restart issued from inside a
+# session just restores that session, so ending the session is the only path.
+# This closes the current user's apps; unsaved work is lost.
+osascript -e 'display dialog "Return to the login window?
+
+Your apps will close. Anyone can then sign in." buttons {"Cancel","Switch user"} default button "Cancel" with icon caution' \
+  -e 'if button returned of result is "Switch user" then do shell script "killall -u $(id -un) loginwindow" with administrator privileges' 2>/dev/null \
+  || sudo /usr/bin/killall loginwindow

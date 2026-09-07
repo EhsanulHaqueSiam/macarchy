@@ -1,0 +1,9 @@
+#!/bin/bash
+# Restart and land on the LOGIN WINDOW rather than back in this session.
+# A plain `shutdown -r` from inside a session makes macOS restore that session,
+# so the session is ended first and the reboot is issued from the login window.
+sudo defaults write /Library/Preferences/com.apple.loginwindow lastUser -string loggedOut
+sudo defaults write /Library/Preferences/com.apple.loginwindow lastUserName -string ""
+sudo killall loginwindow 2>/dev/null
+sleep 6
+sudo shutdown -r now
