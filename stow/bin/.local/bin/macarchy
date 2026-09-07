@@ -74,7 +74,10 @@ verify(){
   chk "aerospace parses" "$(aerospace reload-config 2>&1 | /usr/bin/grep -c ERROR)" "0"
   chk "aerospace bindings registered" \
       "$([ "$(aerospace config --get mode.main.binding --json | jq -r 'keys|length')" -gt 50 ] && echo many || echo few)" "many"
-  chk "skhd config clean" "$(/usr/bin/grep -ci error "/tmp/skhd_$USER.err.log" 2>/dev/null || echo 0)" "0"
+  # grep -c prints 0 AND exits 1 on no match, so `|| echo 0` would append a
+  # second zero and this could never pass.
+  local serr; serr=$(/usr/bin/grep -ci error "/tmp/skhd_$USER.err.log" 2>/dev/null); serr=${serr:-0}
+  chk "skhd config clean" "$serr" "0"
 
   echo "bar:"
   chk "sketchybar running" "$(pgrep -x sketchybar >/dev/null && echo y || echo n)" "y"

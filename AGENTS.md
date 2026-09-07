@@ -75,6 +75,10 @@ to sshd from the command line. `macarchy docs` must run on the Mac itself.
 identical to a broken one over ssh. Never conclude a Raycast binding is broken
 from a headless test.
 
+**`grep -c` prints `0` and exits `1`** when nothing matches, so the common
+`$(grep -c x file || echo 0)` yields `"0\n0"` and every equality test against it
+fails. This bit twice here. Assign, then default: `n=$(grep -c ...); n=${n:-0}`.
+
 ## Measuring
 
 - `ps pcpu` is a **lifetime average**, not current load. It reported AeroSpace at
