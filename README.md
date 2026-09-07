@@ -141,6 +141,15 @@ SketchyBar sits at CG level 25, above the menu bar's 24, so the auto-hide reveal
 
 Window transparency (`⌥⌫`), single-window square aspect, the webcam overlay, laptop-display toggles, scroll-to-switch-workspace, true tabbed groups, Hyprland animations, and F9 push-to-talk dictation (skhd has no key-release event).
 
+## Screenshots
+
+`make docs` captures the bar, the tiling behaviour and a demo GIF into `docs/`,
+then inserts the gallery into this README.
+
+It has to run on the Mac itself. macOS gates screen capture behind a Screen
+Recording grant that cannot be given to an ssh session from the command line, so
+`screencapture` over ssh only ever returns "could not create image from display".
+
 ## Troubleshooting
 
 `omarchy-mac-doctor` checks all four services, both configs, that they stay disjoint, that AeroSpace callbacks get `USER` (without it SketchyBar stops repainting), that `bordersrc` actually invokes borders, and the macOS settings the rig depends on.

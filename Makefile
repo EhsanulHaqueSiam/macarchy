@@ -2,7 +2,7 @@
 # targets below need no flags.
 PKGS := aerospace skhd sketchybar borders bin
 
-.PHONY: help install link relink unlink brew trust defaults colors services doctor keys dump
+.PHONY: help install link relink unlink brew trust defaults colors services doctor keys dump docs
 .DEFAULT_GOAL := help
 
 help:            ## show this help
@@ -44,6 +44,9 @@ doctor:          ## health check
 
 keys:            ## print the keybinding cheat sheet
 	@omarchy-mac-keys-gen
+
+docs:            ## capture screenshots + demo gif (run ON the Mac, not over ssh)
+	@./scripts/capture-docs.sh
 
 dump:            ## refresh Brewfile.full from this machine
 	@brew bundle dump --file=Brewfile.full --force && echo "Brewfile.full updated"
