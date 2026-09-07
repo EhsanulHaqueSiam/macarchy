@@ -27,7 +27,7 @@ fi
 
 say "Linking configs (GNU stow)"
 mkdir -p "$HOME/.config" "$HOME/.local/bin" "$HOME/.local/state/sketchybar"
-stow -d "$REPO/stow" -t "$HOME" --restow aerospace skhd sketchybar borders bin
+(cd "$REPO" && stow --restow aerospace skhd sketchybar borders bin)  # .stowrc sets --dir/--target
 
 # AeroSpace's TOML cannot expand $HOME, so exec.env-vars carries absolute paths.
 # stow symlinks the file, so this edits the repo copy - which is correct: your

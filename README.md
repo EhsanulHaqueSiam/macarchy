@@ -35,6 +35,31 @@ Three things macOS will not let a script do:
 
 Then `omarchy-mac-doctor` should print `all good`.
 
+## Layout
+
+GNU stow packages, one per tool. `.stowrc` points stow at `stow/` with `$HOME` as
+the target, so `stow sketchybar` from the repo root needs no flags.
+
+```
+omarchy-mac/
+├── Makefile              make help / link / doctor / keys / dump
+├── install.sh            brew + trust + stow + defaults + services
+├── macos-defaults.sh     the macOS settings the rig depends on
+├── Brewfile              what this rig needs
+├── Brewfile.full         full dump of the machine, for a rebuild
+├── .stowrc               --dir=stow --target=~
+└── stow/
+    ├── aerospace/  .aerospace.toml
+    ├── skhd/       .config/skhd/skhdrc
+    ├── sketchybar/ .config/sketchybar/{sketchybarrc,theme.sh,plugins/*.sh}
+    ├── borders/    .config/borders/bordersrc
+    └── bin/        .local/bin/omarchy-mac-*        (35 helpers)
+```
+
+Everything in `$HOME` is a symlink back into this repo, so editing a config in
+place is editing the repo. `make relink` after adding a file, `make unlink` to
+back the symlinks out without losing anything.
+
 ## How it fits together
 
 | piece | owns |
