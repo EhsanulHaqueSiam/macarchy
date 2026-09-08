@@ -22,17 +22,18 @@ export BAR_ACCENT=0xff${ACCENT:-b59790}
 export BAR_RED=0xff${RED:-c38b7b}
 EOC
 
-# looknfeel.lua: border_size = 2, active border is a two-stop gradient,
-# inactive is translucent grey. The theme ships both as Hyprland colour
-# strings, so they are the single source of truth here too.
+# looknfeel.lua: border_size = 2 with a grey two-stop gradient. That reads on
+# Hyprland but vanishes on macOS (2pt of grey next to a dark window), so the
+# focused window gets the theme's bright foreground, solid, at 6pt. Inactive
+# keeps the theme's translucent grey.
 #
 # style=round, NOT square, even though Omarchy sets rounding = 0. Hyprland's
 # rounding squares the WINDOW, so a square border fits it exactly. AppKit
 # rounds every macOS window at the OS level and nothing can turn that off, so
 # a square border overshoots each rounded corner and fills the gap with a
 # thick blob. round is the only style that hugs the real window shape.
-set -- $(hypr hyprland_active_border)
-AFROM=${1:-0xee8a8588}; ATO=${2:-$AFROM}
+BRIGHT=$(get bright_foreground)
+ACTIVE=0xff${BRIGHT:-${FG:-FAFCFB}}
 INACT=$(hypr hyprland_inactive_border); INACT=${INACT:-0xaa584e51}
 
 # A retina display needs hidpi=on or the 2pt border renders thin and soft.
@@ -47,9 +48,9 @@ cat > "$HOME/.config/borders/bordersrc" <<EOB
 # started with no arguments, so it MUST end by invoking borders with options.
 options=(
   style=round
-  width=2.0
+  width=6.0
   hidpi=$HIDPI
-  active_color="gradient(top_left=$AFROM,bottom_right=$ATO)"
+  active_color=$ACTIVE
   inactive_color=$INACT
 )
 borders "\${options[@]}"

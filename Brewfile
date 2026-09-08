@@ -21,6 +21,7 @@ brew "displayplacer"     # omarchy-mac-scale
 brew "ffmpeg"            # omarchy-mac-transcode
 brew "imagemagick"       # omarchy-mac-transcode
 brew "fzf"               # omarchy-mac-keys
+brew "duti"              # macos-defaults.sh: Ghostty as the default terminal
 
 # terminal + TUIs the bindings launch
 cask "ghostty"

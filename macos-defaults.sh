@@ -21,6 +21,13 @@ defaults write -g NSWindowShouldDragOnGesture -bool true
 defaults write -g _HIHideMenuBar -bool true
 osascript -e 'tell application "System Events" to tell dock preferences to set autohide menu bar to true' >/dev/null 2>&1 || true
 
+# --- default terminal -----------------------------------------------------
+# macOS has no "default terminal" setting; the closest thing is owning the
+# shell-script file types (double-click in Finder, `open foo.command`). ⌥Return
+# and omarchy-mac-run already launch Ghostty directly.
+for ext in sh tool zsh bash; do duti -s com.mitchellh.ghostty .$ext all; done
+duti -s com.mitchellh.ghostty com.apple.terminal.shell-script all   # .command only takes the UTI
+
 killall Dock >/dev/null 2>&1 || true
 killall SystemUIServer >/dev/null 2>&1 || true
 echo "macOS defaults applied."
