@@ -41,6 +41,7 @@ sketchybar --add event aerospace_workspace_change
 # Fired by the ⌥⌃N / ⌥⌃I toggles so the indicator repaints at once
 # instead of waiting out the poll below.
 sketchybar --add event indicators_refresh
+sketchybar --add event updates_refresh   # fired by the updates click after upgrading
 
 # Workspaces are hardcoded 1..10 (+S) to match ⌥1..⌥0 and ⌥S. Enumerating them
 # with `aerospace list-workspaces` here creates ZERO items whenever sketchybar
@@ -85,8 +86,8 @@ sketchybar --add item clock center \
 sketchybar --add item updates center \
   --set updates drawing=off icon="" icon.color=$ACCENT update_freq=1800 \
         script="$PLUGIN_DIR/updates.sh" \
-        click_script="$HOME/.local/bin/omarchy-mac-run 'brew upgrade; echo; read -r -p \"done \"'" \
-  --subscribe updates system_woke
+        click_script="$HOME/.local/bin/omarchy-mac-run 'brew upgrade; mas upgrade; mise up; sketchybar --trigger updates_refresh; echo; read -r -p \"done \"'" \
+  --subscribe updates updates_refresh system_woke
 
 # --- right: first added sits furthest right ------------------------------
 # Omarchy's order, left to right, is bluetooth network audio monitor power.
