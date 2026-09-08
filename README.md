@@ -40,12 +40,12 @@ cd macarchy
 
 That installs Homebrew if missing, runs the `Brewfile`, links every config with GNU stow, applies the macOS defaults, starts the four services and runs the health check.
 
-`install.sh` taps and `brew trust`s the third-party taps first (AeroSpace, SketchyBar, borders, skhd, nightlight);
+`install.sh` taps and `brew trust`s the third-party taps first (AeroSpace, SketchyBar, borders, skhd, nightlight, AutoRaise);
 Homebrew refuses to load their formulae otherwise and `brew bundle` fails.
 
 Three things macOS will not let a script do:
 
-- **Privacy & Security > Accessibility**: AeroSpace, borders
+- **Privacy & Security > Accessibility**: AeroSpace, borders, AutoRaise
 - **Privacy & Security > Input Monitoring**: skhd
 - **Control Center > Menu Bar Only > Automatically hide and show the menu bar**: Always
 
@@ -69,6 +69,7 @@ macarchy/
     ├── skhd/       .config/skhd/skhdrc
     ├── sketchybar/ .config/sketchybar/{sketchybarrc,theme.sh,plugins/*.sh}
     ├── borders/    .config/borders/bordersrc
+    ├── autoraise/  .config/AutoRaise/config
     └── bin/        .local/bin/omarchy-mac-*        (35 helpers)
 ```
 
@@ -84,6 +85,7 @@ back the symlinks out without losing anything.
 | **skhd** | anything that launches a program, plus key synthesis (⌥C/⌥V/⌥X) |
 | **SketchyBar** | the top bar |
 | **JankyBorders** | the active-window border |
+| **AutoRaise** | focus follows mouse, Hyprland style |
 
 `~/.aerospace.toml` and `~/.config/skhd/skhdrc` are **strictly disjoint**. A chord bound in both fires twice, so `omarchy-mac-doctor` diffs the two files and fails if they intersect.
 

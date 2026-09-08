@@ -17,6 +17,7 @@ else
 fi
 
 pgrep -x borders >/dev/null && ok "borders running" || bad "borders (grant Accessibility, then: brew services restart borders)"
+pgrep -x AutoRaise >/dev/null && ok "autoraise running" || bad "autoraise (grant Accessibility, then: brew services restart autoraise)"
 
 # JankyBorders execs bordersrc when started with no arguments, so a bordersrc
 # that never calls `borders` leaves it silently running on stock defaults -

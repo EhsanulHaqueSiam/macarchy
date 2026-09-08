@@ -1,0 +1,20 @@
+#AutoRaise config file
+# Focus follows mouse, Hyprland style. The brew build lacks focusDelay
+# (EXPERIMENTAL_FOCUS_FIRST), so delay=1 is the minimum: raise+focus one poll
+# after the pointer stops over a window. Tiled windows never overlap, so the
+# raise part is invisible; it only matters for floating ones.
+pollMillis=50
+delay=1
+# No pointer warp on cmd-tab, same reason ~/.aerospace.toml has no move-mouse.
+warpX=0
+warpY=0
+altTaskSwitcher=true
+requireMouseStop=true
+# Focus the hovered window right after a workspace switch, like Hyprland.
+ignoreSpaceChanged=false
+# Windows that must keep focus while the pointer wanders: password prompts,
+# the screenshot region picker, Raycast.
+stayFocusedBundleIds="com.apple.SecurityAgent,com.apple.screencaptureui,com.raycast.macos"
+# Hold control to pause it (ctrl+cmd+drag moves windows).
+disableKey="control"
+mouseDelta=0.1

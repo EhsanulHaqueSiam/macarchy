@@ -4,12 +4,14 @@ tap "felixkratz/formulae"
 tap "nikitabobko/tap"
 tap "smudge/smudge"
 tap "asmvik/formulae"   # skhd moved here from koekeishiya
+tap "dimentium/autoraise"
 
 # window manager, hotkeys, bar, borders
 cask "aerospace"
 brew "felixkratz/formulae/borders"
 brew "felixkratz/formulae/sketchybar"
 brew "asmvik/formulae/skhd"
+brew "dimentium/autoraise/autoraise"   # focus follows mouse
 
 # used by the bar and the bindings
 brew "blueutil"          # bluetooth widget

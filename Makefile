@@ -1,6 +1,6 @@
 # Omarchy on macOS. `.stowrc` points stow at ./stow -> $HOME, so the stow
 # targets below need no flags.
-PKGS := aerospace skhd sketchybar borders bin zsh
+PKGS := aerospace skhd sketchybar borders bin zsh autoraise
 
 .PHONY: help install link relink unlink brew trust defaults colors services doctor verify keys dump docs
 .DEFAULT_GOAL := help
@@ -24,7 +24,7 @@ brew:            ## install the Brewfile
 	@brew bundle --file=Brewfile
 
 trust:           ## trust the third-party taps (brew refuses to load them otherwise)
-	@for t in felixkratz/formulae nikitabobko/tap smudge/smudge asmvik/formulae; do \
+	@for t in felixkratz/formulae nikitabobko/tap smudge/smudge asmvik/formulae dimentium/autoraise; do \
 		brew tap $$t >/dev/null 2>&1 || true; brew trust --tap $$t || true; done
 
 defaults:        ## apply the macOS settings this rig depends on
@@ -38,6 +38,7 @@ services:        ## restart aerospace, skhd, sketchybar, borders
 	@skhd --restart-service || true
 	@sketchybar --reload || true
 	@brew services restart borders >/dev/null || true
+	@brew services restart autoraise >/dev/null || true
 
 doctor:          ## health check
 	@macarchy doctor

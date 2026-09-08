@@ -4,7 +4,7 @@
 set -uo pipefail
 export PATH="$HOME/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 REPO="${MACARCHY_REPO:-$HOME/macarchy}"
-PKGS="aerospace skhd sketchybar borders bin zsh"
+PKGS="aerospace skhd sketchybar borders bin zsh autoraise"
 
 usage(){ cat <<'USAGE'
 macarchy <command>
@@ -16,7 +16,7 @@ macarchy <command>
   where          print the repo path
 
   link | relink | unlink    GNU stow the configs into $HOME
-  reload         restart aerospace, skhd, sketchybar, borders
+  reload         restart aerospace, skhd, sketchybar, borders, autoraise
   colors         rebuild bar + border colours from the active Omarchy theme
   docs           capture screenshots + demo gif (must run ON the Mac, not over ssh)
 
@@ -112,6 +112,7 @@ case "${1:-help}" in
             skhd --restart-service || true
             sketchybar --reload || true
             brew services restart borders >/dev/null 2>&1 || true
+            brew services restart autoraise >/dev/null 2>&1 || true
             echo "reloaded" ;;
   help|-h|--help) usage ;;
   *) echo "unknown command: $1" >&2; echo; usage; exit 2 ;;
