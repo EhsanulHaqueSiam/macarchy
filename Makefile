@@ -1,6 +1,6 @@
 # Omarchy on macOS. `.stowrc` points stow at ./stow -> $HOME, so the stow
 # targets below need no flags.
-PKGS := aerospace skhd sketchybar borders bin
+PKGS := aerospace skhd sketchybar borders bin zsh
 
 .PHONY: help install link relink unlink brew trust defaults colors services doctor verify keys dump docs
 .DEFAULT_GOAL := help
