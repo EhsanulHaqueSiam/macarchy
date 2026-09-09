@@ -29,8 +29,15 @@ brew "duti"              # macos-defaults.sh: Ghostty as the default terminal
 cask "ghostty"
 brew "btop"
 brew "lazydocker"
+brew "lazygit"
 brew "neovim"
 brew "tmux"
+
+# omarchy.zsh shell defaults
+brew "zoxide"
+brew "starship"
+brew "eza"
+brew "bat"
 
 # fonts the bar draws with
 cask "font-jetbrains-mono-nerd-font"
