@@ -70,6 +70,7 @@ macarchy/
     ├── sketchybar/ .config/sketchybar/{sketchybarrc,theme.sh,plugins/*.sh}
     ├── borders/    .config/borders/bordersrc
     ├── autoraise/  .config/AutoRaise/config
+    ├── ghostty/    .config/ghostty/{config,themes/last-horizon}
     └── bin/        .local/bin/omarchy-mac-*        (35 helpers)
 ```
 

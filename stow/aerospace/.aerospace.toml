@@ -198,7 +198,7 @@ alt-tab = 'workspace --wrap-around next'        # Next workspace
 alt-shift-tab = 'workspace --wrap-around prev'  # Previous workspace
 alt-ctrl-tab = 'workspace-back-and-forth'       # Former workspace
 
-alt-s = 'workspace --auto-back-and-forth S'         # Toggle scratchpad
+# alt-s freed for Ghostty quick terminal; scratchpad toggle stays on alt-backtick
 alt-backtick = 'workspace --auto-back-and-forth S'  # Toggle scratchpad
 alt-cmd-s = 'move-node-to-workspace S'              # Move window to scratchpad
 alt-shift-backtick = 'move-node-to-workspace S'     # Move window to scratchpad

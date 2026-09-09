@@ -1,0 +1,52 @@
+# Omarchy Ghostty config, macOS edition. Theme = Omarchy last-horizon.
+theme = last-horizon
+font-family = "JetBrainsMono Nerd Font"
+font-style = Regular
+font-size = 13
+window-padding-x = 14
+window-padding-y = 14
+confirm-close-surface = false
+resize-overlay = never
+macos-titlebar-style = hidden
+macos-option-as-alt = false
+cursor-style = "block"
+cursor-style-blink = false
+shell-integration-features = no-cursor,ssh-env
+mouse-scroll-multiplier = 0.95
+keybind = shift+enter=csi:13;2u
+
+# Option is the window manager's key on this Mac, so tmux's Alt bindings are sent with Cmd.
+keybind = cmd+enter=text:\x1b\r
+keybind = cmd+shift+enter=csi:13;4u
+keybind = cmd+escape=text:\x1b\x1b
+keybind = cmd+one=text:\x1b1
+keybind = cmd+two=text:\x1b2
+keybind = cmd+three=text:\x1b3
+keybind = cmd+four=text:\x1b4
+keybind = cmd+five=text:\x1b5
+keybind = cmd+six=text:\x1b6
+keybind = cmd+seven=text:\x1b7
+keybind = cmd+eight=text:\x1b8
+keybind = cmd+nine=text:\x1b9
+keybind = cmd+left=text:\x1b[1;3D
+keybind = cmd+right=text:\x1b[1;3C
+keybind = cmd+up=text:\x1b[1;3A
+keybind = cmd+down=text:\x1b[1;3B
+keybind = cmd+shift+left=text:\x1b[1;4D
+keybind = cmd+shift+right=text:\x1b[1;4C
+keybind = ctrl+cmd+left=text:\x1b[1;7D
+keybind = ctrl+cmd+right=text:\x1b[1;7C
+keybind = ctrl+cmd+up=text:\x1b[1;7A
+keybind = ctrl+cmd+down=text:\x1b[1;7B
+keybind = ctrl+cmd+shift+left=text:\x1b[1;8D
+keybind = ctrl+cmd+shift+right=text:\x1b[1;8C
+keybind = ctrl+cmd+shift+up=text:\x1b[1;8A
+keybind = ctrl+cmd+shift+down=text:\x1b[1;8B
+
+# Quake-style drop-down terminal (needs Accessibility permission for the global bind)
+keybind = global:alt+s=toggle_quick_terminal
+quick-terminal-position = top
+quick-terminal-screen = mouse
+quick-terminal-autohide = true
+quick-terminal-animation-duration = 0
+quick-terminal-space-behavior = move
