@@ -43,6 +43,7 @@ alt + shift - o : /usr/bin/open -a Obsidian  # Obsidian
 alt + shift - w : ~/.local/bin/omarchy-mac-note  # Omawrite (daily note)
 alt + shift - 0x2C : /usr/bin/open -a Passwords  # Passwords
 alt + shift + ctrl - a : ~/.local/bin/omarchy-mac-run "claude --permission-mode auto"  # Agent
+ctrl + alt + cmd - return : ~/.local/bin/omarchy-mac-launch-session  # Daily session (Chrome/Orca/Chrome/Discord across workspaces 1-4)
 
 # --- web apps -----------------------------------------------------------
 alt + shift - a : ~/.local/bin/omarchy-mac-webapp https://chatgpt.com  # ChatGPT
