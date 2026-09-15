@@ -9,8 +9,10 @@ export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/c
 # Java for Android tooling and maestro (Android Studio's bundled JBR hangs from a shell)
 export JAVA_HOME="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
 export PATH="$JAVA_HOME/bin:$HOME/.maestro/bin:$PATH"
-# Metro/Expo advertise the Tailscale IP so the phone and omarchy reach the dev server
-export REACT_NATIVE_PACKAGER_HOSTNAME=100.123.46.67
+# Metro/Expo advertise the Tailscale IP so the phone and omarchy reach the dev
+# server. Computed, not hardcoded: this file is shared between two machines,
+# and each has its own Tailscale IP.
+export REACT_NATIVE_PACKAGER_HOSTNAME=$(tailscale ip -4 2>/dev/null)
 # ssh/mosh sessions land in a persistent tmux session so agent runs survive disconnects
 if [[ $- == *i* && -t 0 && -n "${SSH_CONNECTION:-}" && -z "${TMUX:-}" ]]; then
   exec tmux new-session -A -s main
@@ -24,4 +26,4 @@ source ~/.config/zsh/omarchy.zsh
 export PATH="$HOME/.orbstack/bin:$PATH"
 
 autoload -Uz compinit && compinit   # daytona completion calls compdef
-source /Users/ehsanulhaquesiam/.daytona.completion_script.zsh
+[[ -f "$HOME/.daytona.completion_script.zsh" ]] && source "$HOME/.daytona.completion_script.zsh"

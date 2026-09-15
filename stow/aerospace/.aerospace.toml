@@ -64,7 +64,7 @@ on-window-detected = [
   # AeroSpace stops at the FIRST matching callback unless
   # check-further-callbacks is set, so this catch-all only runs for windows
   # that matched no float rule above. `if` is required: omitting it is an error.
-  { if = 'true', run = ['exec-and-forget /Users/ehsanulhaquesiam/.local/bin/omarchy-mac-dwindle'] },
+  { if = 'true', run = ['exec-and-forget $HOME/.local/bin/omarchy-mac-dwindle'] },
 ]
 
 [exec]
@@ -75,10 +75,16 @@ inherit-env-vars = false
 # is missing, which silently broke every workspace-change repaint that had no
 # focus change to fall back on - i.e. switching to an EMPTY workspace looked
 # like the bar was frozen. Absolute paths everywhere for the same reason.
+#
+# This repo is shared between two Mac accounts (different USER/HOME). AeroSpace
+# interpolates ${ENV_VAR} here from its OWN process env - i.e. whichever
+# account is actually running AeroSpace - so leave these as variables, never a
+# literal username/path, or the other machine's `aerospace reload-config`
+# silently ends up pointing at your home directory instead of theirs.
 [exec.env-vars]
-USER = 'ehsanulhaquesiam'
-HOME = '/Users/ehsanulhaquesiam'
-PATH = '/Users/ehsanulhaquesiam/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
+USER = '${USER}'
+HOME = '${HOME}'
+PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 
 [key-mapping]
 preset = 'qwerty'

@@ -1,0 +1,48 @@
+#!/bin/bash
+# CTRL+OPT+CMD+RETURN: open the daily four-workspace session - Sou-hardo
+# Chrome on 1, Orca on 2, ledgercross-team Chrome on 3, Discord on 4.
+AEROSPACE=/opt/homebrew/bin/aerospace
+
+# Chrome: launch "$2.." then move whichever NEW window it creates onto
+# workspace "$1". Diffing window-ids (present after, not before) is needed
+# here because Chrome can have unrelated windows open on other workspaces
+# that must not be disturbed.
+place_new_window(){
+  local workspace="$1"; shift
+  local before after new=""
+  before=$("$AEROSPACE" list-windows --all --format '%{window-id}' 2>/dev/null | sort -n)
+  "$@"
+  for _ in $(seq 1 100); do
+    sleep 0.2
+    after=$("$AEROSPACE" list-windows --all --format '%{window-id}' 2>/dev/null | sort -n)
+    new=$(comm -13 <(echo "$before") <(echo "$after") | tail -1)
+    [ -n "$new" ] && break
+  done
+  [ -n "$new" ] && "$AEROSPACE" move-node-to-workspace --window-id "$new" "$workspace"
+}
+
+# Orca/Discord: single-window apps. `open -a` on an already-running instance
+# just raises its existing window instead of creating a fresh one, so a
+# window-id diff never fires - move every window the app already owns
+# instead of waiting for a "new" one.
+place_app(){
+  local workspace="$1" bundle_id="$2"
+  /usr/bin/open -b "$bundle_id"
+  local ids=""
+  for _ in $(seq 1 100); do
+    ids=$("$AEROSPACE" list-windows --monitor all --app-bundle-id "$bundle_id" --format '%{window-id}' 2>/dev/null)
+    [ -n "$ids" ] && break
+    sleep 0.2
+  done
+  local id
+  for id in $ids; do
+    "$AEROSPACE" move-node-to-workspace --window-id "$id" "$workspace"
+  done
+}
+
+place_new_window 1 /usr/bin/open -na "Google Chrome" --args --profile-directory=Default --new-window \
+  https://github.com https://monkeytype.com https://x.com
+place_app 2 com.stablyai.orca
+place_new_window 3 /usr/bin/open -na "Google Chrome" --args --profile-directory="Profile 1" --new-window \
+  https://github.com
+place_app 4 com.hnc.Discord
