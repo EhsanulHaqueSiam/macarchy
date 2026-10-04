@@ -62,6 +62,12 @@ for id in 79 80 81 82; do
 done
 /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u 2>/dev/null || true
 
+# --- startup ----------------------------------------------------------------
+# Ghostty runs hidden from login so the ⌥S quick terminal works before any window.
+osascript -e 'tell application "System Events" to if not (exists login item "Ghostty") then make login item at end with properties {path:"/Applications/Ghostty.app", hidden:true}' >/dev/null 2>&1 || true
+# Boot back up after a power cut (an office Mac reached over Tailscale).
+sudo -n pmset -a autorestart 1 2>/dev/null || echo "  skipped pmset autorestart (needs sudo)"
+
 # --- screenshots ----------------------------------------------------------
 # ⌘⇧3/4/5 and Screenshot.app land next to F13's, not on the Desktop.
 mkdir -p "$HOME/Pictures/Screenshots"

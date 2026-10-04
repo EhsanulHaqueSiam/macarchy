@@ -252,6 +252,18 @@ macarchy keys              # human cheat sheet, generated from the live configs
 macarchy reload            # restart all four services
 ```
 
+## Startup
+
+At login: AeroSpace (its own login item), skhd, SketchyBar, borders and AutoRaise
+(launchd agents), and Ghostty hidden with no window, so `⌥S` and `⌥Return` work
+before anything is opened. `omarchy-mac-doctor` runs 25s after login and posts a
+notification if anything is off. `macos-defaults.sh` also sets `pmset autorestart`
+so a power cut does not leave the Mac off.
+
+A locked screen is fine for remote work: iOS Simulators and Android emulators boot,
+stream and take input through T3 Code's device hub while locked. Only the window
+manager waits, since macOS hides windows from AeroSpace until unlock.
+
 ## Troubleshooting
 
 `omarchy-mac-doctor` checks all four services, both configs, that they stay disjoint, that AeroSpace callbacks get `USER` (without it SketchyBar stops repainting), that `bordersrc` actually invokes borders, and the macOS settings the rig depends on.

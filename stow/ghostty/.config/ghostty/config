@@ -45,6 +45,10 @@ keybind = ctrl+cmd+shift+down=text:\x1b[1;8B
 
 # Quake-style drop-down terminal (needs Accessibility permission for the global bind)
 keybind = global:alt+s=toggle_quick_terminal
+# Ghostty starts hidden at login (macos-defaults.sh adds it) so ⌥S and ⌥Return are
+# ready at once: no window until one is asked for, and it stays running without one.
+initial-window = false
+quit-after-last-window-closed = false
 quick-terminal-position = top
 quick-terminal-screen = mouse
 quick-terminal-autohide = true

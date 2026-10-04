@@ -6,10 +6,8 @@
 # `open -na` started a whole new Ghostty per window: slower, and each instance
 # lingered after its window closed and grabbed ⌥S for its own quick terminal.
 # The first use from skhd asks once to let skhd control Ghostty.
-if ! pgrep -xq ghostty; then
-  [ $# -eq 0 ] && exec open -a Ghostty
-  exec open -a Ghostty --args -e /bin/zsh -lic "$*"
-fi
+# `tell` launches Ghostty when it is not running; initial-window = false keeps that
+# launch from opening a second window.
 exec osascript - "$*" <<'AS'
 on run argv
   set cmd to item 1 of argv

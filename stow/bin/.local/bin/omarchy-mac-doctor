@@ -96,6 +96,8 @@ nc -z 127.0.0.1 5900 >/dev/null 2>&1 && ok "screen sharing (5900)" || bad "scree
 [ -x "$HOME/.local/bin/omarchy-mac-switch-user" ] && ok "switch-user (bar > power menu)" || bad "switch-user helper missing"
 [ "$(defaults read com.apple.WindowManager EnableTilingByEdgeDrag 2>/dev/null)$(defaults read com.apple.WindowManager EnableTilingOptionAccelerator 2>/dev/null)" = "00" ] \
   && ok "macOS window tiling off (AeroSpace owns tiling)" || bad "macOS tiling still on (run macos-defaults.sh)"
+pgrep -xq ghostty && ok "ghostty running (⌥S quick terminal ready)" || bad "ghostty not running (open -a Ghostty; macos-defaults.sh adds the login item)"
+[ "$(pmset -g | awk '$1=="autorestart"{print $2}')" = 1 ] && ok "restarts after power loss" || bad "autorestart off (sudo pmset -a autorestart 1)"
 [ -f "$HOME/Library/KeyBindings/DefaultKeyBinding.dict" ] && ok "Linux text keys (⌃←/→ words, Home/End)" || bad "text keys (run macos-defaults.sh)"
 # Optional: the one Omarchy chord that needs a hand-made Shortcuts automation.
 /usr/bin/shortcuts list 2>/dev/null | /usr/bin/grep -qx "Toggle Do Not Disturb" && ok "do-not-disturb shortcut" ||

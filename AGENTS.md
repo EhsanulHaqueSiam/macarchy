@@ -77,6 +77,12 @@ CoreGraphics instead (the `frame` helper in `macarchy`).
 new window over AppleScript. Never go back to `open -na Ghostty`: every call
 started a new Ghostty that outlived its window and grabbed ⌥S for its own quick terminal.
 
+**Non-interactive ssh reads only `~/.zshenv`.** Tool environment that scripts
+and agents need (Android SDK, `JAVA_HOME`, PATH) lives there, not in `.zshrc`.
+T3 Code's device hub runs `avdmanager`/`emulator`/`adb` over plain ssh; with
+them in `.zshrc` it reported `Failed to run avdmanager list avd`. After moving
+env, kill the hub (`pkill -f expo-device-hub`) so T3 restarts it with the new one.
+
 **Never restart skhd over ssh while the Mac is locked.** skhd aborts at start
 when secure input is held (`secure keyboard entry is enabled by ... 'loginwindow'`),
 so a restart from a locked or signed-out console takes the launcher half down until
