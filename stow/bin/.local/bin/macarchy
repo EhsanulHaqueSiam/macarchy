@@ -42,8 +42,16 @@ for line in open(aero):
     if m:
         rows.append({"tool": "aerospace", "chord": m.group(1),
                      "action": m.group(2), "desc": (m.group(3) or "").strip()})
+block = None
 for line in open(skhd):
     s = line.rstrip("\n")
+    # Per-app blocks: `chord [` ... `* : cmd  # desc` ... `]`. Read the `*` line as the chord.
+    if s.strip().endswith("["):
+        block = s.strip()[:-1].strip(); continue
+    if s.strip() == "]":
+        block = None; continue
+    if block and s.strip().startswith("*"):
+        s = block + s.strip()[1:]
     if s.strip().startswith(("#", ".")) or ":" not in s:
         continue
     body, _, desc = s.partition("#")
@@ -78,6 +86,16 @@ verify(){
   # second zero and this could never pass.
   local serr; serr=$(/usr/bin/grep -ci error "/tmp/skhd_$USER.err.log" 2>/dev/null); serr=${serr:-0}
   chk "skhd config clean" "$serr" "0"
+
+  echo "binding targets:"
+  # A chord whose app or helper is gone does nothing at all, silently.
+  local miss="" a
+  while read -r a; do /usr/bin/open -Ra "$a" 2>/dev/null || miss="$miss app:$a"; done < <(
+    /usr/bin/grep -oE 'open -n?a ("[^"]+"|[A-Za-z]+)' "$HOME/.config/skhd/skhdrc" |
+    sed -E 's/^open -n?a //; s/"//g' | sort -u)
+  while read -r a; do [ -x "$HOME/.local/bin/$a" ] || miss="$miss bin:$a"; done < <(
+    /usr/bin/grep -oE '~/\.local/bin/[A-Za-z0-9-]+' "$HOME/.config/skhd/skhdrc" | sed 's|.*/||' | sort -u)
+  chk "every app and helper a binding calls exists" "${miss# }" ""
 
   echo "bar:"
   chk "sketchybar running" "$(pgrep -x sketchybar >/dev/null && echo y || echo n)" "y"

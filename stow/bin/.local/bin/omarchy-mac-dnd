@@ -1,0 +1,14 @@
+#!/bin/bash
+# SUPER+CTRL+COMMA: toggle Do Not Disturb (Omarchy's notification silencing).
+#
+# macOS has no CLI for Focus, so this runs a one-action Shortcuts automation.
+# Make it once in Shortcuts.app: new shortcut named "Toggle Do Not Disturb",
+# add the "Set Focus" action, pick Do Not Disturb, set it to Toggle.
+# Until then the chord says so instead of doing nothing.
+n="Toggle Do Not Disturb"
+if /usr/bin/shortcuts list | /usr/bin/grep -qx "$n"; then
+  /usr/bin/shortcuts run "$n"
+else
+  /usr/bin/osascript -e "display notification \"Make a shortcut named '$n': Set Focus > Do Not Disturb > Toggle\" with title \"Do Not Disturb\""
+  /usr/bin/open -a Shortcuts
+fi

@@ -63,9 +63,16 @@ for line in open(AERO):
         add(sec, mods, key, m.group(2), m.group(3))
 
 # ---- skhd ---------------------------------------------------------------
-sec = None
+sec = block = None
 for line in open(SKHD):
     s = line.rstrip("\n")
+    # Per-app blocks: `chord [` ... `* : cmd  # desc` ... `]`. Read the `*` line as the chord.
+    if s.strip().endswith("["):
+        block = s.strip()[:-1].strip(); continue
+    if s.strip() == "]":
+        block = None; continue
+    if block and s.strip().startswith("*"):
+        s = block + s.strip()[1:]
     m = re.match(r"^# --- (.+?) -+$", s.strip())
     if m:
         sec = m.group(1).strip()

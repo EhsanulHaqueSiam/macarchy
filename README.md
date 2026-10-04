@@ -71,7 +71,7 @@ macarchy/
     ├── borders/    .config/borders/bordersrc
     ├── autoraise/  .config/AutoRaise/config
     ├── ghostty/    .config/ghostty/{config,themes/last-horizon}
-    └── bin/        .local/bin/omarchy-mac-*        (37 helpers)
+    └── bin/        .local/bin/omarchy-mac-*        (39 helpers)
 ```
 
 Everything in `$HOME` is a symlink back into this repo, so editing a config in
@@ -196,6 +196,33 @@ SketchyBar sits at CG level 25, above the menu bar's 24, so the auto-hide reveal
 - `⌥⌃X` is Mission Control. Omarchy's dictation toggle has no macOS CLI.
 - `PRINT` is `F13`.
 - Moving an existing window *into* a workspace leaves it as a plain sibling rather than folding it into the spiral; AeroSpace has no callback for a moved window, only a new one. `⌥⌘arrow` nests it, `⌥b` rebalances.
+- `⌥⌃,` (silence notifications) needs a one-time Shortcut, because macOS has no CLI for Focus: in Shortcuts.app make one named `Toggle Do Not Disturb` with a single Set Focus > Do Not Disturb > Toggle action. Until then the chord tells you so.
+
+## Text editing
+
+`⌥←/→` is macOS's word jump, but `⌥` is SUPER here, so the window manager has it. `macos-defaults.sh` gives the Linux keys their Linux meaning instead, as on Omarchy:
+
+| | |
+| --- | --- |
+| `⌃←` `⌃→` | word left / right (add `⇧` to select) |
+| `⌃⌫` `⌃⌦` | delete word back / forward |
+| `Home` `End` | line start / end (add `⇧` to select) |
+| `⌃Home` `⌃End` | document start / end |
+
+That covers Cocoa and Electron/Chrome text fields (T3 Code, Slack, VS Code), once each app is relaunched. `⌃←/→` used to switch macOS Spaces, which AeroSpace never uses, so those system shortcuts are off. zsh gets the same keys plus Omarchy's bash habits: emacs line editing (zsh would otherwise pick vi mode from `EDITOR=nvim`), Up/Down searching history for what is typed, case-insensitive Tab completion.
+
+## Apps that bind ⌥ chords
+
+Any app shortcut that collides with an Omarchy chord loses to the window manager, as it would to Hyprland. T3 Code is the exception that matters, so skhd passes its chords through inside T3 only:
+
+| chord | in T3 Code | everywhere else |
+| --- | --- | --- |
+| `⌘⌥⏎` | send in background | Tmux |
+| `⌘⌥⇧A` | cycle appearance | Grok |
+| `⌘⌥B` | right panel | (AeroSpace extra removed) |
+| `⌥↑` | focus window above | same: T3's edit-queued-message loses here |
+
+AeroSpace cannot pass a chord through per app, so a collision with an AeroSpace binding is settled by moving or dropping the binding, not by an exception.
 
 ## Not reproducible on macOS
 

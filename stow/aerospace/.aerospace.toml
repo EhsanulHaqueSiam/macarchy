@@ -214,8 +214,9 @@ ctrl-cmd-tab = 'focus-monitor --wrap-around next'        # Focus on next monitor
 ctrl-cmd-shift-tab = 'focus-monitor --wrap-around prev'  # Focus on previous monitor
 
 # --- extras AeroSpace offers that Omarchy has no chord for --------------
+# No ⌥⌘B here: T3 Code uses it for its right panel, and AeroSpace cannot pass
+# a chord through per app the way skhd can.
 alt-b = 'balance-sizes'                    # Balance window sizes
-alt-cmd-b = 'focus-back-and-forth'         # Focus the previous window
 alt-m = 'macos-native-minimize'            # Minimize window (macOS)
 
 # --- meta ---------------------------------------------------------------

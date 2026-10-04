@@ -67,9 +67,13 @@ def aero():
         out.add((frozenset(x for x in p if x in MODS), canon('-'.join(x for x in p if x not in MODS))))
     return out
 def skhd():
-    out=set()
+    out=set(); block=None
     for l in open(os.path.expanduser('~/.config/skhd/skhdrc')):
         s=l.strip()
+        # per-app blocks: `chord [` ... `* : cmd` ... `]`
+        if s.endswith('['): block=s[:-1].strip(); continue
+        if s==']': block=None; continue
+        if block and s.startswith('*'): s=block+s[1:]
         if s.startswith('#') or s.startswith('.') or ':' not in s: continue
         lhs=s.split('#')[0].split(':',1)[0].strip()
         if not lhs: continue
@@ -90,6 +94,10 @@ PY
 
 nc -z 127.0.0.1 5900 >/dev/null 2>&1 && ok "screen sharing (5900)" || bad "screen sharing (sudo launchctl kickstart -k system/com.apple.screensharing)"
 [ -x "$HOME/.local/bin/omarchy-mac-switch-user" ] && ok "switch-user (bar > power menu)" || bad "switch-user helper missing"
+[ -f "$HOME/Library/KeyBindings/DefaultKeyBinding.dict" ] && ok "Linux text keys (⌃←/→ words, Home/End)" || bad "text keys (run macos-defaults.sh)"
+# Optional: the one Omarchy chord that needs a hand-made Shortcuts automation.
+/usr/bin/shortcuts list 2>/dev/null | /usr/bin/grep -qx "Toggle Do Not Disturb" && ok "do-not-disturb shortcut" ||
+  printf '  note    ⌥⌃, needs a Shortcut named "Toggle Do Not Disturb" (see omarchy-mac-dnd)\n'
 
 [ $FAIL -eq 0 ] && echo "all good" || osascript -e 'display notification "Run omarchy-mac-doctor in a terminal" with title "Omarchy: something needs attention"'
 exit $FAIL

@@ -28,7 +28,15 @@ alt + ctrl - v : /usr/bin/open raycast://extensions/raycast/clipboard-history/cl
 
 # --- applications -------------------------------------------------------
 alt - return : /usr/bin/open -na Ghostty  # Terminal
-alt + cmd - return : ~/.local/bin/omarchy-mac-tmux  # Tmux
+# T3 Code binds ⌘⌥⏎ (send in background) and ⌘⌥⇧A (cycle appearance) itself,
+# so inside T3 those pass through (`~`) and everywhere else they stay Omarchy's.
+# skhd matches the lowercased process name. The `*` line carries the command
+# and its ⌥K description; the macarchy parsers read it from there.
+alt + cmd - return [
+  "t3 code (nightly)" ~
+  "t3 code" ~
+  * : ~/.local/bin/omarchy-mac-tmux  # Tmux
+]
 alt + ctrl - return : ~/.local/bin/omarchy-mac-run herdr  # Herdr
 alt + shift - return : /usr/bin/open -a Zen  # Browser
 alt + shift - b : /usr/bin/open -a Zen  # Browser
@@ -47,7 +55,11 @@ alt + shift + ctrl - a : ~/.local/bin/omarchy-mac-run "claude --permission-mode 
 
 # --- web apps -----------------------------------------------------------
 alt + shift - a : ~/.local/bin/omarchy-mac-webapp https://chatgpt.com  # ChatGPT
-alt + shift + cmd - a : ~/.local/bin/omarchy-mac-webapp https://grok.com  # Grok
+alt + shift + cmd - a [
+  "t3 code (nightly)" ~
+  "t3 code" ~
+  * : ~/.local/bin/omarchy-mac-webapp https://grok.com  # Grok
+]
 alt + shift - c : ~/.local/bin/omarchy-mac-webapp https://app.hey.com/calendar/weeks/  # Calendar
 alt + shift - e : ~/.local/bin/omarchy-mac-webapp https://app.hey.com  # Email
 alt + shift + cmd - e : ~/.local/bin/omarchy-mac-webapp "https://app.hey.com/messages/new?display=standalone&new_window=true"  # New email
@@ -95,7 +107,7 @@ alt + ctrl - 5 : ~/.local/bin/omarchy-mac-session  # Bar panel 5 (power)
 # --- notifications ------------------------------------------------------
 alt - 0x2B : ~/.local/bin/omarchy-mac-notify dismiss  # Dismiss last notification
 alt + shift - 0x2B : ~/.local/bin/omarchy-mac-notify all  # Dismiss all notifications
-alt + ctrl - 0x2B : /usr/bin/shortcuts run "Toggle Do Not Disturb"  # Toggle silencing notifications
+alt + ctrl - 0x2B : ~/.local/bin/omarchy-mac-dnd  # Toggle silencing notifications
 alt + cmd - 0x2B : ~/.local/bin/omarchy-mac-notify invoke  # Invoke last notification
 alt + shift + cmd - 0x2B : ~/.local/bin/omarchy-mac-notify history  # Notification history
 
@@ -128,7 +140,7 @@ alt + ctrl + cmd - w : ~/.local/bin/omarchy-mac-info weather  # Toggle weather
 f13 : ~/.local/bin/omarchy-mac-screenshot  # Screenshot
 cmd - f13 : /usr/bin/open -a Screenshot  # Screenrecording
 alt - f13 : /usr/bin/open -a "Digital Color Meter"  # Color picker
-alt + ctrl - f13 : /usr/bin/shortcuts run "OCR Screenshot"  # Extract text (OCR) from screenshot
+alt + ctrl - f13 : ~/.local/bin/omarchy-mac-ocr  # Extract text (OCR) from screenshot
 
 # --- media --------------------------------------------------------------
 shift - mute : /opt/homebrew/bin/SwitchAudioSource -n  # Switch audio output

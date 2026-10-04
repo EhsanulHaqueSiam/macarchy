@@ -72,6 +72,20 @@ someone unlocks. launchd retries every ~10s, so it heals itself on unlock. The s
 lock makes `skhd -k` a no-op, so chords cannot be tested headlessly then; run the
 script a binding calls instead. Check with `ioreg -l -w0 | grep SecureInputPID`.
 
+**Per-app exceptions live in skhd blocks**, never AeroSpace (it has none):
+
+```
+alt + cmd - return [
+  "t3 code (nightly)" ~
+  * : ~/.local/bin/omarchy-mac-tmux  # Tmux
+]
+```
+
+`~` passes the chord through to that app; names are the lowercased process
+name. Keep `chord [`, `]` and `* : cmd  # desc` on their own lines: the doctor,
+`macarchy bindings` and the ⌥K generator read the chord from `chord [` and the
+command and description from the `*` line.
+
 **skhd 0.3.9** has no `.shell` directive (it errors and ignores the rest of the
 file) and no key-release event, so push-to-talk style bindings are impossible.
 Errors go to `/tmp/skhd_$USER.err.log`; skhd exits 0 regardless.
@@ -109,6 +123,10 @@ fails. This bit twice here. Assign, then default: `n=$(grep -c ...); n=${n:-0}`.
 Omarchy `SUPER` = `Option`, Omarchy/Hyprland `ALT` = `Command`, `CTRL` = `Control`.
 So `SUPER + SHIFT + ALT + F` is `⌥⇧⌘F`. On a PC keyboard put SUPER on the Win key
 with `omarchy-mac-keyboard-super`.
+
+Because SUPER is `⌥`, app shortcuts on `⌥` chords collide. Before binding a new
+chord, check the apps in use (T3 Code's live list: `~/.t3/userdata/keybindings.json`,
+where `mod` is `⌘` and `alt` is `⌥`). README's "Apps that bind ⌥ chords" has the policy.
 
 Coverage against Omarchy's own `default/hypr/bindings/*.lua` is 145/152 mappable
 bindings. The 7 gaps are impossible on macOS and are listed in README.md; do not

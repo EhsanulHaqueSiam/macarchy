@@ -1,0 +1,36 @@
+#!/bin/bash
+# omarchy-mac-ocr [image]  (SUPER+CTRL+PRINT)
+#
+# Omarchy's omarchy-capture-text: pick a region, OCR it, put the text on the
+# clipboard. JXA reaches macOS's Vision framework directly, so no Shortcuts
+# automation is needed. Pass an image to skip the capture and print the text
+# instead (that is how to test it).
+# Vision returns nothing outside the GUI session: over ssh, wrap it in
+# `sudo launchctl asuser $(id -u) sudo -u $USER omarchy-mac-ocr <image>`.
+f=${1:-}
+if [ -z "$f" ]; then
+  f="${TMPDIR:-/tmp}/omarchy-ocr-$$.png"
+  trap 'rm -f "$f"' EXIT
+  /usr/sbin/screencapture -i "$f" && [ -s "$f" ] || exit 0
+fi
+
+text=$(/usr/bin/osascript -l JavaScript - "$f" <<'JS'
+ObjC.import("Vision");
+function run(argv) {
+  const req = $.VNRecognizeTextRequest.alloc.init;
+  $.VNImageRequestHandler.alloc
+    .initWithURLOptions($.NSURL.fileURLWithPath(argv[0]), $.NSDictionary.dictionary)
+    .performRequestsError($.NSArray.arrayWithObject(req), null);
+  const r = req.results, out = [];
+  for (let i = 0; i < r.count; i++) out.push(r.objectAtIndex(i).topCandidates(1).objectAtIndex(0).string.js);
+  return out.join("\n");
+}
+JS
+)
+
+# Given an image: print, leave the clipboard alone.
+[ -n "${1:-}" ] && { printf '%s\n' "$text"; exit; }
+
+msg="No text found"
+[ -n "$text" ] && printf %s "$text" | /usr/bin/pbcopy && msg="Text copied to clipboard"
+/usr/bin/osascript -e "display notification \"$msg\" with title \"Extract text\""
