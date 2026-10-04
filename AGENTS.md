@@ -9,6 +9,7 @@ traps are real for humans too; most cost hours to find.
 macarchy help       # every subcommand
 macarchy doctor     # health: services, both configs, disjointness, macOS settings
 macarchy verify     # functional regression suite, non-zero exit on failure
+macarchy verify --windows   # plus live window checks (~20s; skips on a locked screen)
 macarchy bindings --json   # every binding from both configs, machine readable
 macarchy keys       # the human cheat sheet, generated from the live configs
 macarchy reload     # restart aerospace, skhd, sketchybar, borders
@@ -64,6 +65,17 @@ AeroSpace says so itself. Use `join-with`, which is what `⌥⌘arrow` is bound 
 `bar-toggle.sh` persists to `~/.local/state/sketchybar/hidden` and sketchybarrc
 replays it. Diagnose with `sketchybar --query <item> | jq .bounding_rects`: a
 hidden bar parks items at origin `-9999,-9999`.
+
+**A locked screen hides every window from AeroSpace.** Window tests on a locked
+Mac fail in confusing ways (new windows never tile, `focus` finds nothing), so
+check `ioreg -n Root -d1 -a | plutil -extract IOConsoleUsers.0.CGSSessionScreenIsLocked raw -o - -`
+first; `verify --windows` does. Over ssh the accessibility API (System Events)
+reports zero windows for every app even when unlocked: read geometry from
+CoreGraphics instead (the `frame` helper in `macarchy`).
+
+**Terminals open in one Ghostty.** `omarchy-mac-run` asks the running Ghostty for a
+new window over AppleScript. Never go back to `open -na Ghostty`: every call
+started a new Ghostty that outlived its window and grabbed ⌥S for its own quick terminal.
 
 **Never restart skhd over ssh while the Mac is locked.** skhd aborts at start
 when secure input is held (`secure keyboard entry is enabled by ... 'loginwindow'`),
@@ -128,6 +140,6 @@ Because SUPER is `⌥`, app shortcuts on `⌥` chords collide. Before binding a 
 chord, check the apps in use (T3 Code's live list: `~/.t3/userdata/keybindings.json`,
 where `mod` is `⌘` and `alt` is `⌥`). README's "Apps that bind ⌥ chords" has the policy.
 
-Coverage against Omarchy's own `default/hypr/bindings/*.lua` is 145/152 mappable
-bindings. The 7 gaps are impossible on macOS and are listed in README.md; do not
+Coverage against Omarchy's own `default/hypr/bindings/*.lua` is 144/152 mappable
+bindings: 7 are impossible on macOS (listed in README.md) and Obsidian is unbound on purpose; do not
 try to "fix" them without checking there first.

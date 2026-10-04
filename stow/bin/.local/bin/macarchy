@@ -11,6 +11,7 @@ macarchy <command>
 
   doctor         health check: services, both configs, disjointness, macOS settings
   verify         run the functional regression suite (exits non-zero on failure)
+  verify --windows   ...plus live window checks on throwaway windows (~20s, needs an unlocked screen)
   keys           the keybinding cheat sheet, generated from the live configs
   bindings       every binding from both configs, as TSV (add --json for JSON)
   where          print the repo path
@@ -110,14 +111,93 @@ verify(){
   done
   aerospace workspace "$start" >/dev/null 2>&1
 
+  if [ "${1:-}" = "--windows" ]; then
+    echo "live windows:"
+    if [ "$(ioreg -n Root -d1 -a | plutil -extract IOConsoleUsers.0.CGSSessionScreenIsLocked raw -o - - 2>/dev/null)" = true ]; then
+      echo "  SKIP  screen is locked: AeroSpace cannot see windows until unlock"
+    else
+      verify_windows
+    fi
+  fi
+
   echo
   echo "$pass passed, $fail failed"
   [ "$fail" -eq 0 ]
 }
 
+# Window frame "x y w h" by AeroSpace window id (= CoreGraphics window number).
+# CoreGraphics works over ssh; the accessibility API returns no windows there.
+frame(){ osascript -l JavaScript -e 'ObjC.import("CoreGraphics");
+  function run(a){ const l = ObjC.castRefToObject($.CGWindowListCopyWindowInfo(8 /* kCGWindowListOptionIncludingWindow */, +a[0]));
+    if (!l.count) return ""; const b = l.objectAtIndex(0).objectForKey("kCGWindowBounds");
+    return ["X","Y","Width","Height"].map(k => Math.round(b.objectForKey(k).js)).join(" "); }' "$1"; }
+
+# `verify --windows`: drives the real bindings against three throwaway TextEdit
+# windows on an empty workspace, then puts everything back. Takes the screen for
+# ~20s. Uses verify's chk/pass/fail (bash locals are dynamically scoped).
+verify_windows(){
+  local start ws="" tgt="" dir ids w w0 f0 hs clip
+  start=$(aerospace list-workspaces --focused)
+  for w in 9 8 7 6; do
+    [ -n "$(aerospace list-windows --workspace $w)" ] && continue
+    if [ -z "$ws" ]; then ws=$w; else tgt=$w; break; fi
+  done
+  [ -z "$tgt" ] && { echo "  SKIP  needs two empty workspaces among 6-9"; return; }
+  bind(){ aerospace trigger-binding "$1" --mode main; sleep 0.4; }
+  fw(){ aerospace list-windows --focused --format '%{window-id}' 2>/dev/null; }
+  changed(){ [ "$1" != "$2" ] && echo yes || echo "no ($1)"; }
+
+  dir=$(mktemp -d); printf 'macarchy-clip-test' > "$dir/a.txt"; printf b > "$dir/b.txt"; printf c > "$dir/c.txt"
+  aerospace workspace "$ws"
+  for f in a b c; do open -a TextEdit "$dir/$f.txt"; sleep 0.8; done
+  for _ in 1 2 3 4 5 6; do [ "$(aerospace list-windows --workspace "$ws" --count)" -ge 3 ] && break; sleep 0.5; done
+  ids=$(aerospace list-windows --workspace "$ws" --format '%{window-id}')
+  chk "3 new windows tile on $ws" "$(echo "$ids" | grep -c .)" "3"
+  # Dwindle: one full-height window beside two stacked halves.
+  hs=$(for w in $ids; do frame "$w" | cut -d' ' -f4; done | sort -n | tr '\n' ' ')
+  chk "dwindle: one full-height, two stacked" \
+      "$(echo $hs | awk '{print (NF==3 && $2-$1<=2 && $3>2*$1-30) ? "yes" : "no (" $0 ")"}')" "yes"
+
+  w0=$(fw); bind alt-left
+  chk "⌥← moves focus" "$(changed "$(fw)" "$w0")" "yes"
+  bind alt-right; chk "⌥→ moves it back" "$(fw)" "$w0"
+  f0=$(frame "$w0"); bind alt-shift-left
+  chk "⌥⇧← swaps the window" "$(changed "$(frame "$w0")" "$f0")" "yes"; bind alt-shift-right
+  f0=$(frame "$w0"); bind alt-j
+  chk "⌥J flips the split" "$(changed "$(frame "$w0")" "$f0")" "yes"; bind alt-j
+  f0=$(frame "$w0"); bind alt-minus
+  chk "⌥- resizes" "$(changed "$(frame "$w0")" "$f0")" "yes"; bind alt-b
+  bind alt-t; chk "⌥T floats" "$(aerospace list-windows --focused --format '%{window-layout}')" "floating"; bind alt-t
+  bind alt-f; chk "⌥F fullscreens" "$(aerospace list-windows --focused --format '%{window-is-fullscreen}')" "true"; bind alt-f
+  bind "alt-shift-cmd-$tgt"
+  chk "⌥⇧⌘$tgt moves it silently" "$(aerospace list-windows --workspace "$tgt" --format '%{window-id}')/$(aerospace list-workspaces --focused)" "$w0/$ws"
+  aerospace move-node-to-workspace --window-id "$w0" "$ws"; aerospace focus --window-id "$w0"; sleep 0.3
+  bind alt-shift-backtick; chk "⌥⇧\` stashes it in the scratchpad" "$(aerospace list-windows --workspace S --format '%{window-id}')" "$w0"
+  bind alt-backtick; chk "⌥\` shows the scratchpad" "$(aerospace list-workspaces --focused)" "S"
+  bind alt-backtick; chk "⌥\` hides it again" "$(aerospace list-workspaces --focused)" "$ws"
+  aerospace move-node-to-workspace --window-id "$w0" "$ws"
+
+  # Universal copy through skhd's synthesized ⌘ chords. Skipped when the
+  # clipboard holds anything but text, since it is overwritten and restored.
+  if osascript -e 'clipboard info' 2>/dev/null | grep -qE "PNG|TIFF|furl|PDF"; then
+    echo "  SKIP  ⌥A ⌥C (clipboard holds non-text)"
+  else
+    clip=$(pbpaste)
+    aerospace focus --window-id "$(aerospace list-windows --workspace "$ws" --format '%{window-id}|%{window-title}' | grep a.txt | cut -d'|' -f1)"; sleep 0.4
+    skhd -k "alt - a"; sleep 0.2; skhd -k "alt - c"; sleep 0.4
+    chk "⌥A ⌥C copy the document" "$(pbpaste)" "macarchy-clip-test"
+    printf %s "$clip" | pbcopy
+  fi
+
+  for w in $(aerospace list-windows --workspace "$ws" --format '%{window-id}'); do
+    aerospace close --window-id "$w" --quit-if-last-window; sleep 0.3
+  done
+  rm -rf "$dir"; aerospace workspace "$start"
+}
+
 case "${1:-help}" in
   doctor)   omarchy-mac-doctor ;;
-  verify)   verify ;;
+  verify)   verify "${2:-}" ;;
   keys)     omarchy-mac-keys-gen ;;
   bindings) [ "${2:-}" = "--json" ] && dump_bindings json || dump_bindings tsv ;;
   where)    echo "$REPO" ;;

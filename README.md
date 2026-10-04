@@ -4,7 +4,7 @@ An [Omarchy](https://omarchy.org)-flavoured macOS desktop: Hyprland's window man
 
 This is not Omarchy running on macOS, and it is not affiliated with the Omarchy project. It recreates Omarchy's look, feel and keymap out of native macOS tools.
 
-145 of Omarchy's 152 mappable default bindings work here (95%). The remaining 7 are listed at the bottom with the reason each one is impossible.
+144 of Omarchy's 152 mappable default bindings work here (95%). Seven are impossible on macOS and listed at the bottom; Obsidian (`⌥⇧O`) is left unbound on purpose.
 
 <!-- gallery -->
 ## Looks like
@@ -112,7 +112,7 @@ back the symlinks out without losing anything.
 | `Alt+Tab` | cycle windows (Omarchy's ALT+TAB; it replaces the macOS app switcher) |
 | `` ⌥` `` | scratchpad (`⌥S` is the Ghostty quick terminal) |
 | `⌥⌃⌘F` | full screen desktop: bar and gaps away together |
-| `⌥Return` | terminal |
+| `⌥Return` | terminal: a new window in the one running Ghostty (the first use asks to let skhd control Ghostty) |
 | `⌥Space` | launcher |
 | `⌥⇧Space` | swap the bar for the real macOS menu bar |
 | `⌥⌘M` | the focused app's File/Edit/View menus |
@@ -246,6 +246,7 @@ the ownership rule, the traps, and how to verify a change.
 macarchy help              # every subcommand
 macarchy doctor            # services, configs, disjointness, macOS settings
 macarchy verify            # functional regression suite, non-zero exit on failure
+macarchy verify --windows  # ...plus the real bindings on throwaway windows (~20s, unlocked screen)
 macarchy bindings --json   # all 186 bindings from both configs, machine readable
 macarchy keys              # human cheat sheet, generated from the live configs
 macarchy reload            # restart all four services

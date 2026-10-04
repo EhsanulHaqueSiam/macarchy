@@ -22,7 +22,9 @@ start-at-login = true
 auto-reload-config = true
 after-startup-command = [
   'exec-and-forget /opt/homebrew/bin/sketchybar --reload',
-  'exec-and-forget /opt/homebrew/bin/skhd --restart-service',
+  # Start skhd only if it is down. A restart would kill a healthy skhd, and on a
+  # locked screen skhd refuses to start again until unlock (secure input).
+  "exec-and-forget /bin/bash -c '/usr/bin/pgrep -xq skhd || /opt/homebrew/bin/skhd --start-service'",
 ]
 
 # Keep both normalizations on. AeroSpace's guide recommends them for anyone who

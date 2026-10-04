@@ -27,7 +27,7 @@ alt - a : /opt/homebrew/bin/skhd -k "cmd - a"  # Select all
 alt + ctrl - v : /usr/bin/open raycast://extensions/raycast/clipboard-history/clipboard-history  # Clipboard manager
 
 # --- applications -------------------------------------------------------
-alt - return : /usr/bin/open -na Ghostty  # Terminal
+alt - return : ~/.local/bin/omarchy-mac-run  # Terminal
 # T3 Code binds ⌘⌥⏎ (send in background) and ⌘⌥⇧A (cycle appearance) itself,
 # so inside T3 those pass through (`~`) and everywhere else they stay Omarchy's.
 # skhd matches the lowercased process name. The `*` line carries the command
@@ -48,7 +48,6 @@ alt + shift - m : /usr/bin/open -a Music  # Music
 alt + shift + cmd - m : ~/.local/bin/omarchy-mac-run "command -v cliamp >/dev/null && cliamp || open -a Music"  # Music TUI
 alt + shift - d : ~/.local/bin/omarchy-mac-run lazydocker  # Docker
 alt + shift - g : /usr/bin/open -a Signal  # Signal
-alt + shift - o : /usr/bin/open -a Obsidian  # Obsidian
 alt + shift - w : ~/.local/bin/omarchy-mac-note  # Omawrite (daily note)
 alt + shift - 0x2C : /usr/bin/open -a Passwords  # Passwords
 alt + shift + ctrl - a : ~/.local/bin/omarchy-mac-run "claude --permission-mode auto"  # Agent

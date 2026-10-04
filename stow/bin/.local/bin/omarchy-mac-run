@@ -1,3 +1,27 @@
 #!/bin/bash
-# Run a command in a fresh Ghostty window (Omarchy's TUI launcher pattern).
-exec open -na Ghostty --args -e /bin/zsh -lic "$*"
+# omarchy-mac-run [command...]: a new Ghostty window, running the command if given
+# (Omarchy's terminal and TUI launcher). ⌥Return, Tmux, Omawrite and ⌥K all go here.
+#
+# Every window opens in the ONE running Ghostty through its AppleScript API.
+# `open -na` started a whole new Ghostty per window: slower, and each instance
+# lingered after its window closed and grabbed ⌥S for its own quick terminal.
+# The first use from skhd asks once to let skhd control Ghostty.
+if ! pgrep -xq ghostty; then
+  [ $# -eq 0 ] && exec open -a Ghostty
+  exec open -a Ghostty --args -e /bin/zsh -lic "$*"
+fi
+exec osascript - "$*" <<'AS'
+on run argv
+  set cmd to item 1 of argv
+  tell application "Ghostty"
+    if cmd is "" then
+      new window
+    else
+      set cfg to new surface configuration
+      set command of cfg to "/bin/zsh -lic " & quoted form of cmd
+      new window with configuration cfg
+    end if
+    activate
+  end tell
+end run
+AS

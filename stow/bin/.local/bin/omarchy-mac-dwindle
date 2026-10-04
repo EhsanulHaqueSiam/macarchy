@@ -25,8 +25,8 @@ export PATH="/opt/homebrew/bin:$PATH"
 # Fewer than three windows already looks like dwindle: one fills the screen,
 # two split it. Joining at two would nest the pair under the root and the
 # flatten normalization would just collapse it back to a stack.
-ws=$(aerospace list-workspaces --focused 2>/dev/null) || exit 0
-n=$(aerospace list-windows --workspace "$ws" --count 2>/dev/null) || exit 0
+# Three aerospace calls in all (~10ms each): every one delays the re-nest.
+n=$(aerospace list-windows --workspace focused --count 2>/dev/null) || exit 0
 [ "${n:-0}" -lt 3 ] && exit 0
 
 case "$(aerospace list-windows --focused --format '%{window-layout}' 2>/dev/null)" in

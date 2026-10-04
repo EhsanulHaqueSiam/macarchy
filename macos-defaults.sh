@@ -15,6 +15,15 @@ defaults write com.apple.universalaccess reduceMotion -bool true
 # Ctrl+Cmd+drag anywhere on a window to move it - Hyprland's SUPER+drag analog.
 defaults write -g NSWindowShouldDragOnGesture -bool true
 
+# macOS's own tiling (Sequoia+) fights AeroSpace: dragging to an edge snaps the
+# window, and holding Option while dragging (Option is SUPER here) does too.
+defaults write com.apple.WindowManager EnableTilingByEdgeDrag -bool false
+defaults write com.apple.WindowManager EnableTopTilingByEdgeDrag -bool false
+defaults write com.apple.WindowManager EnableTilingOptionAccelerator -bool false
+defaults write com.apple.WindowManager EnableTiledWindowMargins -bool false
+# Clicking the wallpaper (a gap between tiles) would shove every window aside.
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
+
 # --- menu bar -------------------------------------------------------------
 # The bar replaces it. `defaults` alone needs a logout on macOS 26, so also poke
 # the live System Events property (this is what SUPER+SHIFT+SPACE toggles).
