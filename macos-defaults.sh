@@ -21,6 +21,11 @@ defaults write -g NSWindowShouldDragOnGesture -bool true
 defaults write -g _HIHideMenuBar -bool true
 osascript -e 'tell application "System Events" to tell dock preferences to set autohide menu bar to true' >/dev/null 2>&1 || true
 
+# --- screenshots ----------------------------------------------------------
+# ⌘⇧3/4/5 and Screenshot.app land next to F13's, not on the Desktop.
+mkdir -p "$HOME/Pictures/Screenshots"
+defaults write com.apple.screencapture location -string "$HOME/Pictures/Screenshots"
+
 # --- default terminal -----------------------------------------------------
 # macOS has no "default terminal" setting; the closest thing is owning the
 # shell-script file types (double-click in Finder, `open foo.command`). ⌥Return

@@ -1,7 +1,8 @@
 #!/bin/bash
-# PRINT-equivalent (F13). Interactive region capture to ~/Pictures AND the
+# PRINT-equivalent (F13). Interactive region capture to ~/Pictures/Screenshots AND the
 # clipboard, like Omarchy's satty flow. screencapture does one or the other,
 # so the file is read back into the clipboard as PNG.
-f="$HOME/Pictures/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png"
+mkdir -p "$HOME/Pictures/Screenshots"
+f="$HOME/Pictures/Screenshots/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png"
 /usr/sbin/screencapture -i "$f" && [ -s "$f" ] \
   && osascript -e "set the clipboard to (read (POSIX file \"$f\") as «class PNGf»)"

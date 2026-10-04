@@ -1,0 +1,31 @@
+#!/bin/bash
+# omarchy-mac-fullscreen-desktop [toggle|on|off]  (SUPER+CTRL+ALT+F)
+#
+# Omarchy's full screen desktop: hide the bar and drop every gap together.
+# Like omarchy-toggle-fullscreen-desktop, toggle only leaves when both halves
+# are already in it, so a lone bar or gaps toggle is pulled into line.
+# The macOS menu bar stays auto-hidden, unlike ⌥⇧Space which swaps it in.
+source "$HOME/.config/sketchybar/theme.sh"   # PATH and $STATE
+f=$(readlink -f "$HOME/.aerospace.toml" 2>/dev/null || echo "$HOME/.aerospace.toml")
+
+action=${1:-toggle}
+if [ "$action" = toggle ]; then
+  if [ "$(sketchybar --query bar | jq -r .hidden)" = on ] &&
+     /usr/bin/grep -qE "^inner\.horizontal *= *0$" "$f"; then
+    action=off
+  else
+    action=on
+  fi
+fi
+
+if [ "$action" = on ]; then
+  sketchybar --bar hidden=on
+  osascript -e 'tell application "System Events" to tell dock preferences to set autohide menu bar to true' >/dev/null 2>&1
+  "$HOME/.local/bin/omarchy-mac-gaps" off   # reads the bar state, so it runs second
+else
+  sketchybar --bar hidden=off
+  "$HOME/.local/bin/omarchy-mac-gaps" on
+fi
+
+mkdir -p "$STATE"
+sketchybar --query bar | jq -r .hidden > "$STATE/hidden"

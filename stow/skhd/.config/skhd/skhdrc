@@ -4,7 +4,7 @@
 #
 # OWNERSHIP - this file and ~/.aerospace.toml are strictly disjoint:
 #   AeroSpace  = native window/workspace commands (no process spawn).
-#   skhd       = anything that runs a program, plus key synthesis (⌥C/⌥V/⌥X).
+#   skhd       = anything that runs a program, plus key synthesis (⌥C/⌥V/⌥X/⌥A).
 # Never bind a chord in both or it fires twice. `omarchy-mac-doctor` checks this.
 #
 # Ported 1:1 from ~/.local/share/omarchy/default/hypr/bindings/{applications,
@@ -23,6 +23,7 @@
 alt - c : /opt/homebrew/bin/skhd -k "cmd - c"  # Universal copy
 alt - v : /opt/homebrew/bin/skhd -k "cmd - v"  # Universal paste
 alt - x : /opt/homebrew/bin/skhd -k "cmd - x"  # Universal cut
+alt - a : /opt/homebrew/bin/skhd -k "cmd - a"  # Select all
 alt + ctrl - v : /usr/bin/open raycast://extensions/raycast/clipboard-history/clipboard-history  # Clipboard manager
 
 # --- applications -------------------------------------------------------
@@ -78,6 +79,7 @@ alt + ctrl - b : /usr/bin/open x-apple.systempreferences:com.apple.BluetoothSett
 alt + ctrl - w : /usr/bin/open x-apple.systempreferences:com.apple.Network-Settings.extension  # Network
 alt + ctrl - d : /usr/bin/open x-apple.systempreferences:com.apple.Displays-Settings.extension  # Display
 alt + ctrl + cmd - d : /usr/bin/open -a Calendar  # Calendar
+alt + ctrl + cmd - e : /usr/bin/open -a Clock  # World clock
 alt + ctrl - p : ~/.local/bin/omarchy-mac-session  # Power
 alt + ctrl - t : ~/.local/bin/omarchy-mac-run btop  # Activity
 
@@ -100,6 +102,7 @@ alt + shift + cmd - 0x2B : ~/.local/bin/omarchy-mac-notify history  # Notificati
 # --- toggles ------------------------------------------------------------
 alt + shift - space : ~/.config/sketchybar/plugins/bar-toggle.sh  # Toggle top bar
 alt + shift - backspace : ~/.local/bin/omarchy-mac-gaps  # Toggle window gaps
+alt + ctrl + cmd - f : ~/.local/bin/omarchy-mac-fullscreen-desktop  # Toggle full screen desktop
 alt + ctrl - space : ~/.local/bin/omarchy-mac-bg  # Background switcher
 alt + shift + ctrl - space : ~/.local/bin/omarchy-mac-theme  # Theme menu
 alt + ctrl - i : ~/.local/bin/omarchy-mac-idle; /opt/homebrew/bin/sketchybar --trigger indicators_refresh  # Toggle locking on idle

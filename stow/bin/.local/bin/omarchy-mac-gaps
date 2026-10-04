@@ -1,7 +1,10 @@
 #!/bin/bash
+# omarchy-mac-gaps [toggle|on|off]
+#
 # AeroSpace reads [gaps] only at load, so the only gaps toggle is: rewrite the
 # block and reload. ON = Omarchy (in 10 / out 10 / top bar+gap). OFF = zero, but
-# top stays at the bar height so windows never slide under SketchyBar.
+# top stays at the bar height so windows never slide under SketchyBar. With the
+# bar hidden (full screen desktop) an external display gives up the top too.
 #
 # The config is a GNU stow symlink and `sed -i` refuses those outright
 # ("in-place editing only works for regular files"), so resolve it first.
@@ -12,10 +15,17 @@ f=$(readlink -f "$HOME/.aerospace.toml" 2>/dev/null || echo "$HOME/.aerospace.to
 # State is read from inner.horizontal, not outer.top: outer.top is a per-monitor
 # array (built-in displays reserve more for the notch) and will not compare
 # cleanly against a single number.
-if /usr/bin/grep -qE "^inner\.horizontal *= *0$" "$f"; then
-  i=$GAP; o=$GAP; t="[{ monitor.\"built-in\" = $NOTCH }, $TOP]"   # gaps on
+action=${1:-toggle}
+if [ "$action" = toggle ]; then
+  /usr/bin/grep -qE "^inner\.horizontal *= *0$" "$f" && action=on || action=off
+fi
+
+if [ "$action" = on ]; then
+  i=$GAP; o=$GAP; t="[{ monitor.\"built-in\" = $NOTCH }, $TOP]"
 else
-  i=0;    o=0;    t="[{ monitor.\"built-in\" = $BAR }, $BAR]"     # gaps off
+  top=$BAR
+  [ "$(/opt/homebrew/bin/sketchybar --query bar 2>/dev/null | /opt/homebrew/bin/jq -r .hidden)" = on ] && top=0
+  i=0; o=0; t="[{ monitor.\"built-in\" = $BAR }, $top]"
 fi
 
 /usr/bin/sed -i '' -E \

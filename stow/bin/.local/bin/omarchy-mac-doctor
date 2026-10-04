@@ -5,7 +5,13 @@ ok(){ printf '  ok      %s\n' "$1"; }; bad(){ printf '  MISSING %s\n' "$1"; FAIL
 FAIL=0
 
 aerospace list-workspaces --focused >/dev/null 2>&1 && ok "aerospace responds" || bad "aerospace (grant Accessibility, then: open -a AeroSpace)"
-pgrep -x skhd >/dev/null && ok "skhd running" || bad "skhd (grant Input Monitoring, then: skhd --restart-service)"
+# skhd aborts at start while anything holds secure input (the login window,
+# a locked screen), so restarting it over ssh with nobody signed in kills it
+# until unlock. launchd retries every ~10s, so it heals on its own.
+if pgrep -x skhd >/dev/null; then ok "skhd running"
+elif tail -1 "/tmp/skhd_$USER.err.log" 2>/dev/null | /usr/bin/grep -q "secure keyboard entry"; then
+  bad "skhd (waiting: screen is locked or at the login window; it starts on unlock)"
+else bad "skhd (grant Input Monitoring, then: skhd --restart-service)"; fi
 pgrep -x sketchybar >/dev/null && ok "sketchybar running" || bad "sketchybar (brew services restart sketchybar)"
 # The bar can be legitimately hidden (⌥⇧Space), and sketchybarrc replays that
 # state on every reload - so a stale state file keeps re-hiding it and looks

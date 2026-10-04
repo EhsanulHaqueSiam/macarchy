@@ -4,7 +4,7 @@ An [Omarchy](https://omarchy.org)-flavoured macOS desktop: Hyprland's window man
 
 This is not Omarchy running on macOS, and it is not affiliated with the Omarchy project. It recreates Omarchy's look, feel and keymap out of native macOS tools.
 
-142 of Omarchy's 149 mappable default bindings work here (95%). The remaining 7 are listed at the bottom with the reason each one is impossible.
+145 of Omarchy's 152 mappable default bindings work here (95%). The remaining 7 are listed at the bottom with the reason each one is impossible.
 
 <!-- gallery -->
 ## Looks like
@@ -71,7 +71,7 @@ macarchy/
     ├── borders/    .config/borders/bordersrc
     ├── autoraise/  .config/AutoRaise/config
     ├── ghostty/    .config/ghostty/{config,themes/last-horizon}
-    └── bin/        .local/bin/omarchy-mac-*        (35 helpers)
+    └── bin/        .local/bin/omarchy-mac-*        (37 helpers)
 ```
 
 Everything in `$HOME` is a symlink back into this repo, so editing a config in
@@ -83,7 +83,7 @@ back the symlinks out without losing anything.
 | piece | owns |
 | --- | --- |
 | **AeroSpace** | tiling, focus, workspaces. Native commands only, no process spawn |
-| **skhd** | anything that launches a program, plus key synthesis (⌥C/⌥V/⌥X) |
+| **skhd** | anything that launches a program, plus key synthesis (⌥C/⌥V/⌥X/⌥A) |
 | **SketchyBar** | the top bar |
 | **JankyBorders** | the active-window border |
 | **AutoRaise** | focus follows mouse, Hyprland style |
@@ -110,7 +110,8 @@ back the symlinks out without losing anything.
 | `⌥-` `⌥=` | resize (add `⌘` for fine, `⌃` for coarse) |
 | `⌥Tab` / `⌥⇧Tab` | next / previous workspace |
 | `Alt+Tab` | cycle windows (Omarchy's ALT+TAB; it replaces the macOS app switcher) |
-| `⌥S` / `` ⌥` `` | scratchpad |
+| `` ⌥` `` | scratchpad (`⌥S` is the Ghostty quick terminal) |
+| `⌥⌃⌘F` | full screen desktop: bar and gaps away together |
 | `⌥Return` | terminal |
 | `⌥Space` | launcher |
 | `⌥⇧Space` | swap the bar for the real macOS menu bar |

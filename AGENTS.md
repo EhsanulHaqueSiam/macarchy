@@ -65,6 +65,13 @@ AeroSpace says so itself. Use `join-with`, which is what `⌥⌘arrow` is bound 
 replays it. Diagnose with `sketchybar --query <item> | jq .bounding_rects`: a
 hidden bar parks items at origin `-9999,-9999`.
 
+**Never restart skhd over ssh while the Mac is locked.** skhd aborts at start
+when secure input is held (`secure keyboard entry is enabled by ... 'loginwindow'`),
+so a restart from a locked or signed-out console takes the launcher half down until
+someone unlocks. launchd retries every ~10s, so it heals itself on unlock. The same
+lock makes `skhd -k` a no-op, so chords cannot be tested headlessly then; run the
+script a binding calls instead. Check with `ioreg -l -w0 | grep SecureInputPID`.
+
 **skhd 0.3.9** has no `.shell` directive (it errors and ignores the rest of the
 file) and no key-release event, so push-to-talk style bindings are impossible.
 Errors go to `/tmp/skhd_$USER.err.log`; skhd exits 0 regardless.
@@ -103,6 +110,6 @@ Omarchy `SUPER` = `Option`, Omarchy/Hyprland `ALT` = `Command`, `CTRL` = `Contro
 So `SUPER + SHIFT + ALT + F` is `⌥⇧⌘F`. On a PC keyboard put SUPER on the Win key
 with `omarchy-mac-keyboard-super`.
 
-Coverage against Omarchy's own `default/hypr/bindings/*.lua` is 142/149 mappable
+Coverage against Omarchy's own `default/hypr/bindings/*.lua` is 145/152 mappable
 bindings. The 7 gaps are impossible on macOS and are listed in README.md; do not
 try to "fix" them without checking there first.

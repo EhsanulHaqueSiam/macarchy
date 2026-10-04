@@ -8,7 +8,7 @@
 #
 # OWNERSHIP - this file and ~/.config/skhd/skhdrc are strictly disjoint:
 #   AeroSpace  = native AeroSpace commands (no process spawn, lowest latency).
-#   skhd       = anything that runs a program, plus key synthesis (⌥C/⌥V/⌥X).
+#   skhd       = anything that runs a program, plus key synthesis (⌥C/⌥V/⌥X/⌥A).
 # Never bind the same chord in both; both would fire. omarchy-mac-doctor checks.
 #
 # The `# comment` after each binding is its description in ⌥K
