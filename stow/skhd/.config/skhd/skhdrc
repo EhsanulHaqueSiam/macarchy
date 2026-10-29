@@ -41,22 +41,7 @@ alt + shift - g : /usr/bin/open -a Signal  # Signal
 alt + shift - o : /usr/bin/open -a Obsidian  # Obsidian
 alt + shift - w : ~/.local/bin/omarchy-mac-note  # Omawrite (daily note)
 alt + shift - 0x2C : /usr/bin/open -a Passwords  # Passwords
-alt + shift + ctrl - a : ~/.local/bin/omarchy-mac-run "claude --permission-mode auto"  # Agent
-ctrl + alt + cmd - return : ~/.local/bin/omarchy-mac-launch-session  # Daily session (Chrome/Orca/Chrome/Discord across workspaces 1-4)
-
-# --- web apps -----------------------------------------------------------
-alt + shift - a : ~/.local/bin/omarchy-mac-webapp https://chatgpt.com  # ChatGPT
-alt + shift + cmd - a : ~/.local/bin/omarchy-mac-webapp https://grok.com  # Grok
-alt + shift - c : ~/.local/bin/omarchy-mac-webapp https://app.hey.com/calendar/weeks/  # Calendar
-alt + shift - e : ~/.local/bin/omarchy-mac-webapp https://app.hey.com  # Email
-alt + shift + cmd - e : ~/.local/bin/omarchy-mac-webapp "https://app.hey.com/messages/new?display=standalone&new_window=true"  # New email
-alt + shift - y : ~/.local/bin/omarchy-mac-webapp https://youtube.com/  # YouTube
-alt + shift + cmd - g : ~/.local/bin/omarchy-mac-webapp https://web.whatsapp.com/  # WhatsApp
-alt + shift + ctrl - g : ~/.local/bin/omarchy-mac-webapp https://messages.google.com/web/conversations  # Google Messages
-alt + shift - p : ~/.local/bin/omarchy-mac-webapp https://photos.google.com/  # Google Photos
-alt + shift - s : ~/.local/bin/omarchy-mac-webapp https://maps.google.com/  # Google Maps
-alt + shift - x : ~/.local/bin/omarchy-mac-webapp https://x.com/  # X
-alt + shift + cmd - x : ~/.local/bin/omarchy-mac-webapp https://x.com/compose/post  # X Post
+alt + shift - a : ~/.local/bin/omarchy-mac-run "claude --permission-mode auto"  # Agent
 
 # --- menus --------------------------------------------------------------
 alt - space : /usr/bin/open -a Tinycast  # Tinycast
@@ -112,14 +97,6 @@ alt + cmd - 0x2C : ~/.local/bin/omarchy-mac-scale down  # Monitor scaling down
 alt + ctrl - 0x2F : ~/.local/bin/omarchy-mac-transcode  # Transcode
 alt + ctrl - z : ~/.local/bin/omarchy-mac-zoom in  # Zoom in
 alt + ctrl + cmd - z : ~/.local/bin/omarchy-mac-zoom reset  # Reset zoom
-
-# --- reminders and toasts -----------------------------------------------
-alt + ctrl - r : /usr/bin/open -a Reminders  # Set reminder
-alt + ctrl + cmd - r : /usr/bin/open -a Reminders  # Show reminders
-alt + shift + ctrl - r : /usr/bin/open -a Reminders  # Clear reminders
-alt + ctrl + cmd - t : ~/.local/bin/omarchy-mac-info time  # Show time
-alt + ctrl + cmd - b : ~/.local/bin/omarchy-mac-info power  # Show battery remaining
-alt + ctrl + cmd - w : ~/.local/bin/omarchy-mac-info weather  # Toggle weather
 
 # --- capture (F13 sits where PrintScreen does on a full-size Apple keyboard) --
 f13 : ~/.local/bin/omarchy-mac-screenshot  # Screenshot
