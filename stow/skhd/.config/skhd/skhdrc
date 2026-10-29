@@ -27,7 +27,6 @@ alt + ctrl - v : /usr/bin/open raycast://extensions/raycast/clipboard-history/cl
 
 # --- applications -------------------------------------------------------
 alt - return : /usr/bin/open -na Ghostty  # Terminal
-alt + cmd - return : ~/.local/bin/omarchy-mac-tmux  # Tmux
 alt + ctrl - return : ~/.local/bin/omarchy-mac-run herdr  # Herdr
 alt + shift - return : /usr/bin/open -a Zen  # Browser
 alt + shift - b : /usr/bin/open -a Zen  # Browser

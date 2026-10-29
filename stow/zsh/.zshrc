@@ -27,3 +27,8 @@ export PATH="$HOME/.orbstack/bin:$PATH"
 
 autoload -Uz compinit && compinit   # daytona completion calls compdef
 [[ -f "$HOME/.daytona.completion_script.zsh" ]] && source "$HOME/.daytona.completion_script.zsh"
+
+# Android SDK
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin
