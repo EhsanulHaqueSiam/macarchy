@@ -28,9 +28,9 @@ alt + ctrl - v : /usr/bin/open raycast://extensions/raycast/clipboard-history/cl
 # --- applications -------------------------------------------------------
 alt - return : /usr/bin/open -na Ghostty  # Terminal
 alt + ctrl - return : ~/.local/bin/omarchy-mac-run herdr  # Herdr
-alt + shift - return : /usr/bin/open -a Zen  # Browser
-alt + shift - b : /usr/bin/open -a Zen  # Browser
-alt + shift + cmd - b : /usr/bin/open -na Zen --args --private-window  # Browser (private)
+alt + shift - return : /usr/bin/open -a "Google Chrome"  # Browser
+alt + shift - b : /usr/bin/open -a "Google Chrome"  # Browser
+alt + shift + cmd - b : /usr/bin/open -na "Google Chrome" --args --incognito  # Browser (private)
 alt + shift - f : /usr/bin/open ~  # File manager
 alt + shift + cmd - f : /usr/bin/open .  # File manager (cwd)
 alt + shift - n : ~/.local/bin/omarchy-mac-run nvim  # Editor
@@ -59,7 +59,7 @@ alt + shift - x : ~/.local/bin/omarchy-mac-webapp https://x.com/  # X
 alt + shift + cmd - x : ~/.local/bin/omarchy-mac-webapp https://x.com/compose/post  # X Post
 
 # --- menus --------------------------------------------------------------
-alt - space : /usr/bin/open -a Raycast  # Omarchy menu
+alt - space : /usr/bin/open -a Tinycast  # Tinycast
 alt + cmd - space : /usr/bin/open raycast://extensions/raycast/raycast/search-applications  # Apps menu
 alt - escape : ~/.local/bin/omarchy-mac-menu  # System menu
 alt - k : ~/.local/bin/omarchy-mac-keys  # Keybindings
